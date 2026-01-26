@@ -1,0 +1,14 @@
+---
+title: Authorization
+---
+When the client requires data from Lendermarket, the client will establish a connection to the Lender Loan API by calling the Loan API URL link and passing the user credentials. The Lender Loan API will check the credentials. Every lender will have a unique “Authorization Key” which will be provided by the LM team. So they can use this key to send API requests. Authorization type will be Bearer Token.
+
+Moreover, LM will also check the lender's IP. Lenders should call Loan API from a static IP so LM can whitelist this IP and not change it frequently. (For test environment, there is no IP control)
+
+
+
+**Test URL**: <a href="https://api2.lendermarket.ro/claims/v1/lender/" target="_blank" rel="noopener noreferrer"><u>https\://api2.lendermarket.ro/claims/v1/lender/</u></a>
+
+**Production URL**: <a href="https://api2.lendermarket.com/claims/v1/lender/" target="_blank" rel="noopener noreferrer"><u>https\://api2.lendermarket.com/claims/v1/lender/</u></a>
+
+**Swagger URL:**<a href="https://api.lendermarket.no/claims/documentation#/Lender-Loan" target="_blank" rel="noopener noreferrer"><u>https\://api.lendermarket.no/claims/documentation#/Lender-Loan</u></a>

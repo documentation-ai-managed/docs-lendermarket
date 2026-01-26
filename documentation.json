@@ -20,16 +20,20 @@
         "icon": "code",
         "groups": [
           {
-            "group": "Endpoints",
-            "openapi": "openapi.yaml",
-            "pages": []
-          },
-          {
             "group": "Lender Loan API",
             "pages": [
               {
                 "title": "Introduction",
-                "path": "introduction"
+                "path": "lender-introduction"
+              },
+              {
+                "title": "Authorizaiton",
+                "path": "lender-authorizaiton"
+              },
+              {
+                "group": "Endpoints",
+                "openapi": "lender-openapi.yaml",
+                "pages": []
               }
             ]
           }
