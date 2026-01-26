@@ -1,0 +1,19 @@
+---
+title: Lender Loan API introduction
+---
+The purpose of this document is to provide a high level specification for Lendermarket’s Loan API (Application Programming Interface). We expect the readers of this document will already have an understanding of basic API/Web Services concepts. 
+
+\
+
+
+The Lender Loan API service will be used by Lendermarket (LM) lenders to create, extend, buyback loans, make payments and view loans whenever they require. Once the API is called by the client, LM will validate and authorize the client and return the necessary information based on the level of access they have and the method they use. The response will be in **JSON** format by default.
+
+\
+
+
+There will be only one web service URL exposed and that particular web service will have various methods for clients to decide and call based on the data they require and the transactions they want to create.
+
+\
+
+
+The details of the methods will be described below.

@@ -23,6 +23,15 @@
             "group": "Endpoints",
             "openapi": "openapi.yaml",
             "pages": []
+          },
+          {
+            "group": "Lender Loan API",
+            "pages": [
+              {
+                "title": "Introduction",
+                "path": "introduction"
+              }
+            ]
           }
         ]
       },
