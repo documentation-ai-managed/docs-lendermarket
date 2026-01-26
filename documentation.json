@@ -1,14 +1,14 @@
 {
   "name": "Lendermarket",
-  "initialRoute": "introduction",
+  "initialRoute": "api/lender/introduction",
   "colors": {
     "light": {
-      "brand": "#5124B8",
+      "brand": "#8551F7",
       "heading": "undefined",
       "text": "undefined"
     },
     "dark": {
-      "brand": "#906EDD",
+      "brand": "#8551F7",
       "heading": "undefined",
       "text": "undefined"
     }
@@ -24,11 +24,11 @@
             "pages": [
               {
                 "title": "Introduction",
-                "path": "lender-introduction"
+                "path": "api/lender/introduction"
               },
               {
                 "title": "Authorizaiton",
-                "path": "lender-authorizaiton"
+                "path": "api/lender/authorizaiton"
               },
               {
                 "group": "Endpoints",
