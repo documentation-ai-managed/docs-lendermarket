@@ -5,9 +5,9 @@ info:
   license:
     name: MIT
 servers:
-  - url: http://api.lendermarket.com/v1
+  - url: https://api.lendermarket.com/claims/v1/lender
 paths:
-  /documents:
+  /createLoan:
     get:
       summary: List all documents
       operationId: listDocuments
