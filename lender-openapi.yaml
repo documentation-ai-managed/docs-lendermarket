@@ -15,7 +15,7 @@ components:
       type: http
       scheme: bearer
       description: |
-        Bearer authentication of the form `Bearer <token>`, where token is your auth token.
+        Bearer authentication of the form **Bearer <token>**, where token is your auth token.
   schemas:
     ErrorResponse:
       type: object
@@ -32,7 +32,7 @@ components:
     Currency:
       type: string
       enum: [EUR]
-      description: "Current validation restricted to EUR"
+      description: "Current validation restricted to `EUR`"
 
     ClientType:
       type: string
@@ -67,7 +67,7 @@ components:
     BusinessClientBase:
       type: object
       required: [companyName, companyRegistryCode, representativeName, representativeCode]
-      description: "Required when `ClientType` is `BUSINESS_WITH_COLLATERAL`"
+      description: "Required when `clientType` is `BUSINESS_WITH_COLLATERAL`"
       properties:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
