@@ -57,7 +57,7 @@ components:
     ConsumerClient:
       type: object
       required: [firstName, lastName, gender, personalCode]
-      description: "Required when ClientType is CONSUMER"
+      description: "Required when `clientType` is `CONSUMER`"
       properties:
         firstName: { type: string, description: "Name of the borrower" }
         lastName: { type: string, description: "Last Name of the borrower" }
@@ -67,7 +67,7 @@ components:
     BusinessClientBase:
       type: object
       required: [companyName, companyRegistryCode, representativeName, representativeCode]
-      description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
+      description: "Required when `ClientType` is `BUSINESS_WITH_COLLATERAL`"
       properties:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
@@ -77,7 +77,7 @@ components:
     BusinessWithCollateral:
       type: object
       required: [companyName, companyRegistryCode, representativeName, representativeCode, collateralValue, currency]
-      description: "Required when ClientType is BUSINESS_WITHOUT_COLLATERAL"
+      description: "Required when `clientType` is `BUSINESS_WITHOUT_COLLATERAL`"
       properties:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
@@ -98,6 +98,12 @@ paths:
   /createLoan:
     post:
       summary: Create Loan
+      description: |
+        Registers a new loan in the Lendermarket system. 
+
+        You must provide either consumer or business client details depending on the `clientType`. 
+
+        Please click on the **try it** button to see the all possible ENUM values for the fields.
       tags: [Loan Management]
       security:
         - bearerAuth: []
@@ -106,12 +112,6 @@ paths:
         content:
           application/json:
             schema:
-              description: |
-                Registers a new loan in the Lendermarket system. 
-
-                You must provide either consumer or business client details depending on the `clientType`. 
-
-                Please click on the **try it** button to see the all possible ENUM values for the fields.
               type: object
               required: [lenderLoanId, scheduleType, loanAmount, currency, interestRate, country, lenderIssueDate, clientType]
               properties:
