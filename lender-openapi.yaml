@@ -48,16 +48,23 @@ components:
         gender: {type: string, enum: [MALE, FEMALE], description: "Gender of the borrower"}
         personalCode: { type: string, description: "ID number of the borrower" }
 
-    BusinessClient:
-      type: object
-      required: [companyName, companyRegistryCode, representativeName, representativeCode, collateralValue, currency]
-      properties:
-        companyName: { type: string, description: "Name of the borrower company" }
-        companyRegistryCode: { type: string, description: "Company Registration Code" }
-        representativeName: { type: string, description: "Company Representative Full Name" }
-        representativeCode: { type: string, description: "ID number of Company Representative" }
-        collateralValue: { type: string, description: "Collateral value for the loan" }
-        currency: { type: string, example: "EUR", description: "Currency of Collateral" }
+    BusinessClientBase:
+          type: object
+          required: [companyName, companyRegistryCode, representativeName, representativeCode]
+          properties:
+            companyName: { type: string, description: "Name of the borrower company" }
+            companyRegistryCode: { type: string, description: "Company Registration Code" }
+            representativeName: { type: string, description: "Company Representative Full Name" }
+            representativeCode: { type: string, description: "ID number of Company Representative" }
+
+    BusinessWithCollateral:
+      allOf:
+        - $ref: '#/components/schemas/BusinessClientBase'
+        - type: object
+          required: [collateralValue, currency]
+          properties:
+            collateralValue: { type: string, description: "Collateral value for the loan" }
+            currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
 paths:
   /createLoan:
@@ -85,7 +92,19 @@ paths:
                   type: string
                   enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
-                businessClient: { $ref: '#/components/schemas/BusinessClient' }
+
+                # Logic to handle mandatory fields based on clientType
+                oneOf:
+                  - properties:
+                      clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
+                      businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
+                  - properties:
+                      clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
+                      businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
+                  - properties:
+                      clientType: { enum: [CONSUMER] }
+                      consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
+
                 schedule:
                   type: array
                   items: { $ref: '#/components/schemas/ScheduleItem' }
