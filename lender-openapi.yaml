@@ -14,8 +14,8 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      description: >
-        Bearer authentication of the form Bearer <token>, where token is your auth token.
+      description: |
+        Bearer authentication of the form `Bearer <token>`, where token is your auth token.
   schemas:
     ErrorResponse:
       type: object
@@ -101,9 +101,9 @@ paths:
       description: |
         Registers a new loan in the Lendermarket system. 
 
-        You must provide either consumer or business client details depending on the 'clientType'. 
+        You must provide either consumer or business client details depending on the `clientType`. 
 
-        Please click on the "try it" button to see the all possible ENUM values for the fields.
+        Please click on the **try it** button to see the all possible ENUM values for the fields.
       tags: [Loan Management]
       security:
         - bearerAuth: []
