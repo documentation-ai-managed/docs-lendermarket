@@ -87,8 +87,6 @@ paths:
                 clientType:
                   type: string
                   enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
-                consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
-
               oneOf:
                 - properties:
                     clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
