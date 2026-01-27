@@ -40,4 +40,13 @@ paths:
               required: [clientType]
               properties:
                 clientType: { $ref: '#/components/schemas/ClientType' }
-
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  lenderLoanId: "ABC-12345"
+                  status: "ACTIVE"
