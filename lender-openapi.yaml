@@ -1,18 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Lendermarket Lender Loan API
-  description: >
-    API service for Lendermarket (LM) lenders to manage the lifecycle of loans, 
-    including creation, extensions, buybacks, payments, and status tracking.
-  version: "1.5"
-  contact:
-    email: support@lendermarket.com
+  title: Lendermarket API - Loan Originator
+  version: 1.0.0
 
 servers:
-  - url: https://api2.lendermarket.com/claims/v1/lender/
+  - url: https://api.lendermarket.com/claims/v1/lender/
     description: Production Environment
-  - url: https://api2.lendermarket.ro/claims/v1/lender/
-    description: Test Environment (IP whitelisting not required)
+  - url: https://api.lendermarket.dev/claims/v1/lender/
+    description: Staging Environment
 
 components:
   securitySchemes:
@@ -20,8 +15,7 @@ components:
       type: http
       scheme: bearer
       description: >
-        Lenders must use a unique "Authorization Key" provided by Lendermarket. 
-        Requests must also originate from a whitelisted static IP (Production only).
+        Bearer authentication of the form Bearer <token>, where token is your auth token.
 
   schemas:
     # --- Generic Components ---
