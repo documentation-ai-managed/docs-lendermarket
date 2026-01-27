@@ -116,16 +116,6 @@ paths:
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
                 schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
                 clientType: { $ref: '#/components/schemas/ClientType' }
-              oneOf:
-                - properties:
-                    clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
-                    businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
-                - properties:
-                    clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
-                    businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
-                - properties:
-                    clientType: { enum: [CONSUMER] }
-                    consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
