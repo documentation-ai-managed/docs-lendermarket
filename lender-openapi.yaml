@@ -15,7 +15,7 @@ components:
       type: http
       scheme: bearer
       description: |
-        Bearer authentication of the form **Bearer <token>**, where token is your auth token.
+        Bearer authentication of the form **Bearer <token>, where token is your auth token.
   schemas:
     ErrorResponse:
       type: object
@@ -99,7 +99,7 @@ paths:
     post:
       summary: Create Loan
       description: |
-        <strong>This will render</strong> because it is indented.
+        Please click on the **try it** button to see the all possible ENUM values for the fields.
       security:
         - bearerAuth: []
       requestBody:
