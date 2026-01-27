@@ -93,6 +93,10 @@ paths:
   /createLoan:
     post:
       summary: Create Loan
+      description: >
+        Registers a new loan in the Lendermarket system. You must provide either 
+        consumer or business client details depending on the 'clientType'. 
+        The 'lenderLoanId' must be unique to your system.
       tags: [Loan Management]
       security:
         - bearerAuth: []
