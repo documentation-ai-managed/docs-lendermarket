@@ -99,8 +99,7 @@ paths:
     post:
       summary: Create Loan
       description: |
-        **This will render** because it is indented.
-      tags: [Loan Management]
+        <strong>This will render</strong> because it is indented.
       security:
         - bearerAuth: []
       requestBody:
