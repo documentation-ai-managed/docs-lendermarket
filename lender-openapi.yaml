@@ -67,7 +67,7 @@ components:
     BusinessClientBase:
           type: object
           required: [companyName, companyRegistryCode, representativeName, representativeCode]
-      description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
+          description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
           properties:
             companyName: { type: string, description: "Name of the borrower company" }
             companyRegistryCode: { type: string, description: "Company Registration Code" }
