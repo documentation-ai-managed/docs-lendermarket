@@ -27,7 +27,12 @@ components:
     Gender:
       type: string
       enum: [MALE, FEMALE]
-      description: Gender of the borrower
+      description: "Gender of the borrower"
+
+    Currency:
+      type: string
+      enum: [EUR]
+      description: "Current validation restricted to EUR"
 
     ClientType:
       type: string
@@ -73,6 +78,14 @@ components:
             collateralValue: { type: string, description: "Collateral value for the loan" }
             currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
+    BuybackReason:
+      type: string
+      enum:
+        - AGREEMENT_TERMINATION
+        - AGREEMENT_PROLONGATION
+        - AGREEMENT_AMENDMENT
+        - EARLY_PAYMENT
+
 paths:
   /createLoan:
     post:
@@ -91,7 +104,7 @@ paths:
                 lenderLoanId: { type: string, description: "Unique Loan ID on lender side" }
                 scheduleType: { $ref: '#/components/schemas/ScheduleType' }
                 loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
-                currency: { type: string, enum: [EUR], description: "Current validation restricted to EUR" }
+                currency: { $ref: '#/components/schemas/Currency'}
                 interestRate: { type: string, description: "Annual interest rate percentage" }
                 country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
@@ -188,9 +201,7 @@ paths:
               required: [loanUuid, reason]
               properties:
                 loanUuid: { type: string }
-                reason:
-                  type: string
-                  enum: [AGREEMENT_TERMINATION, AGREEMENT_PROLONGATION, AGREEMENT_AMENDMENT, EARLY_PAYMENT]
+                reason: { $ref: '#/components/schemas/BuybackReason' }
             example:
               loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
               reason: "EARLY_PAYMENT"
