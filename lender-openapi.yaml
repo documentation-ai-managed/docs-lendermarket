@@ -99,11 +99,7 @@ paths:
     post:
       summary: Create Loan
       description: |
-        Registers a new loan in the Lendermarket system. 
-
-        You must provide either consumer or business client details depending on the `clientType`. 
-
-        Please click on the **try it** button to see the all possible ENUM values for the fields.
+        **This will render** because it is indented.
       tags: [Loan Management]
       security:
         - bearerAuth: []
