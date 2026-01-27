@@ -56,7 +56,7 @@ components:
         companyRegistryCode: { type: string, description: "Company Registration Code" }
         representativeName: { type: string, description: "Company Representative Full Name" }
         representativeCode: { type: string, description: "ID number of Company Representative" }
-        collateralValue: { type: string, "Collateral value for the loan" }
+        collateralValue: { type: string, description: "Collateral value for the loan" }
         currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
 paths:
