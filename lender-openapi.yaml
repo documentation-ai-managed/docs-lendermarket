@@ -37,9 +37,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [clientType]
+              required:
+                - clientType
               properties:
-                clientType: { $ref: '#/components/schemas/ClientType' }
+                clientType:
+                  $ref: '#/components/schemas/ClientType'
       responses:
         '201':
           description: Success
