@@ -72,7 +72,7 @@ components:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
         representativeName: { type: string, description: "Company Representative Full Name" }
-        representativeCode: { type: string, description: "ID number of Company Representative" }
+        representativePersonalCode: { type: string, description: "ID number of Company Representative" }
 
     BusinessWithCollateral:
       type: object
@@ -82,7 +82,7 @@ components:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
         representativeName: { type: string, description: "Company Representative Full Name" }
-        representativeCode: { type: string, description: "ID number of Company Representative" }
+        representativePersonalCode: { type: string, description: "ID number of Company Representative" }
         collateralValue: { type: string, description: "Collateral value for the loan" }
         currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
@@ -99,7 +99,7 @@ paths:
     post:
       summary: Create Loan
       description: |
-        Please click on the **try it** button to see the all possible ENUM values for the fields.
+        Please click on the **try it** button to see all the possible ENUM values for the fields.
       security:
         - bearerAuth: []
       requestBody:
@@ -110,34 +110,36 @@ paths:
               type: object
               required: [lenderLoanId, scheduleType, loanAmount, currency, interestRate, country, lenderIssueDate, clientType]
               properties:
-                lenderLoanId: { type: string, description: "Unique Loan ID on lender side" }
+                lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
                 scheduleType: { $ref: '#/components/schemas/ScheduleType' }
                 loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
                 currency: { $ref: '#/components/schemas/Currency'}
                 interestRate: { type: string, description: "Annual interest rate percentage" }
                 country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
-                lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
+                lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
                 schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
                 clientType: { $ref: '#/components/schemas/ClientType' }
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
                 businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
                 businessClientWithCollateral: { $ref: '#/components/schemas/BusinessWithCollateral' }
             example:
-              lenderLoanId: "ABC-12345"
-              scheduleType: "FULL-BULLET"
-              loanAmount: "1000"
-              currency: "EUR"
-              interestRate: "14"
-              country: "EST"
-              lenderIssueDate: "2023-01-30"
-              clientType: "BUSINESS_WITHOUT_COLLATERAL"
+              lenderLoanId: "ABC-12345",
+              scheduleType: "FULL-BULLET",
+              loanAmount: "500",
+              currency: "EUR",
+              interestRate: "14",
+              country: "EST",
+              lenderIssueDate: "2026-01-26",
+              clientType: "BUSINESS_WITH_COLLATERAL",
               businessClient:
                 companyName: "XYZ-123 Limited"
                 companyRegistryCode: "98765-ZYX"
                 representativeName: "John Doe"
-                representativeCode: "654321-FED"
+                representativePersonalCode: "654321-FED"
+                collateralValue: "1000",
+                currency: "EUR"
               schedule:
-                - date: "2023-02-26"
+                - date: "2026-02-26"
                   principalAmount: "500"
                   interestAmount: "10.50"
       responses:
