@@ -28,16 +28,9 @@ components:
       type: object
       required: [date, principalAmount, interestAmount]
       properties:
-        date:
-          type: string
-          format: date
-          description: Installment Date
-        principalAmount:
-          type: string
-          description: Principal Amount of the Loan
-        interestAmount:
-          type: string
-          description: Interest Amount of the Loan
+        date: { type: string, format: date, description: "Installment Date" }
+        principalAmount: { type: string, description: "Principal Amount of the Loan" }
+        interestAmount: { type: string, description: "Interest Amount of the Loan" }
 
     ConsumerClient:
       type: object
@@ -87,27 +80,25 @@ paths:
                 currency: { type: string, enum: [EUR], description: "Current validation restricted to EUR" }
                 interestRate: { type: string, description: "Annual interest rate percentage" }
                 country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
-                lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side"  }
+                lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
+                schedule:
+                  type: array
+                  items: { $ref: '#/components/schemas/ScheduleItem' }
                 clientType:
                   type: string
                   enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
 
-                # Logic to handle mandatory fields based on clientType
-                oneOf:
-                  - properties:
-                      clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
-                      businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
-                  - properties:
-                      clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
-                      businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
-                  - properties:
-                      clientType: { enum: [CONSUMER] }
-                      consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
-
-                schedule:
-                  type: array
-                  items: { $ref: '#/components/schemas/ScheduleItem' }
+              oneOf:
+                - properties:
+                    clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
+                - properties:
+                    clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
+                - properties:
+                    clientType: { enum: [CONSUMER] }
+                    consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
