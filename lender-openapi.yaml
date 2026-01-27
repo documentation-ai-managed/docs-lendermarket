@@ -65,24 +65,26 @@ components:
         personalCode: { type: string, description: "ID number of the borrower" }
 
     BusinessClientBase:
-          type: object
-          required: [companyName, companyRegistryCode, representativeName, representativeCode]
-          description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
-          properties:
-            companyName: { type: string, description: "Name of the borrower company" }
-            companyRegistryCode: { type: string, description: "Company Registration Code" }
-            representativeName: { type: string, description: "Company Representative Full Name" }
-            representativeCode: { type: string, description: "ID number of Company Representative" }
+      type: object
+      required: [companyName, companyRegistryCode, representativeName, representativeCode]
+      description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
+      properties:
+        companyName: { type: string, description: "Name of the borrower company" }
+        companyRegistryCode: { type: string, description: "Company Registration Code" }
+        representativeName: { type: string, description: "Company Representative Full Name" }
+        representativeCode: { type: string, description: "ID number of Company Representative" }
 
     BusinessWithCollateral:
-      allOf:
-        - $ref: '#/components/schemas/BusinessClientBase'
-        - type: object
-          required: [collateralValue, currency]
-          description: "Required when ClientType is BUSINESS_WITHOUT_COLLATERAL"
-          properties:
-            collateralValue: { type: string, description: "Collateral value for the loan" }
-            currency: { type: string, example: "EUR", description: "Currency of Collateral" }
+      type: object
+      required: [companyName, companyRegistryCode, representativeName, representativeCode, collateralValue, currency]
+      description: "Required when ClientType is BUSINESS_WITHOUT_COLLATERAL"
+      properties:
+        companyName: { type: string, description: "Name of the borrower company" }
+        companyRegistryCode: { type: string, description: "Company Registration Code" }
+        representativeName: { type: string, description: "Company Representative Full Name" }
+        representativeCode: { type: string, description: "ID number of Company Representative" }
+        collateralValue: { type: string, description: "Collateral value for the loan" }
+        currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
     BuybackReason:
       type: string
@@ -96,9 +98,10 @@ paths:
   /createLoan:
     post:
       summary: Create Loan
-      description: >
-        Registers a new loan in the Lendermarket system. You must provide either 
-        consumer or business client details depending on the 'clientType'. 
+      description: |
+        Registers a new loan in the Lendermarket system. 
+
+        You must provide either consumer or business client details depending on the 'clientType'. 
 
         Please click on the "try it" button to see the all possible ENUM values for the fields.
       tags: [Loan Management]
