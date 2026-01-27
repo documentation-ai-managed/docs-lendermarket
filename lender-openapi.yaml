@@ -24,6 +24,20 @@ components:
           type: string
           example: "The selected schedule type is invalid."
 
+    Gender:
+      type: string
+      enum: [MALE, FEMALE]
+      description: Gender of the borrower
+
+    ClientType:
+      type: string
+      enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
+
+    ScheduleType:
+      type: string
+      enum: [ANNUITY, BULLET, FULL-BULLET, REGULAR]
+      description: "Schedule type of the loan"
+
     ScheduleItem:
       type: object
       required: [date, principalAmount, interestAmount]
@@ -38,7 +52,7 @@ components:
       properties:
         firstName: { type: string, description: "Name of the borrower" }
         lastName: { type: string, description: "Last Name of the borrower" }
-        gender: {type: string, enum: [MALE, FEMALE], description: "Gender of the borrower"}
+        gender: { $ref: '#/components/schemas/Gender' }
         personalCode: { type: string, description: "ID number of the borrower" }
 
     BusinessClientBase:
@@ -75,7 +89,7 @@ paths:
               required: [lenderLoanId, scheduleType, loanAmount, currency, interestRate, country, lenderIssueDate, clientType]
               properties:
                 lenderLoanId: { type: string, description: "Unique Loan ID on lender side" }
-                scheduleType: { type: string, description: "Schedule type of the loan", enum: [ANNUITY, BULLET, FULL-BULLET, REGULAR] }
+                scheduleType: { $ref: '#/components/schemas/ScheduleType' }
                 loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
                 currency: { type: string, enum: [EUR], description: "Current validation restricted to EUR" }
                 interestRate: { type: string, description: "Annual interest rate percentage" }
@@ -84,9 +98,7 @@ paths:
                 schedule:
                   type: array
                   items: { $ref: '#/components/schemas/ScheduleItem' }
-                clientType:
-                  type: string
-                  enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
+                clientType: { $ref: '#/components/schemas/ClientType' }
               oneOf:
                 - properties:
                     clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
@@ -105,14 +117,12 @@ paths:
               interestRate: "14"
               country: "EST"
               lenderIssueDate: "2023-01-30"
-              clientType: "BUSINESS_WITH_COLLATERAL"
+              clientType: "BUSINESS_WITHOUT_COLLATERAL"
               businessClient:
                 companyName: "XYZ-123 Limited"
                 companyRegistryCode: "98765-ZYX"
                 representativeName: "John Doe"
                 representativeCode: "654321-FED"
-                collateralValue: "1000"
-                currency: "EUR"
               schedule:
                 - date: "2023-02-26"
                   principalAmount: "500"
