@@ -57,6 +57,7 @@ components:
     ConsumerClient:
       type: object
       required: [firstName, lastName, gender, personalCode]
+      description: "Required when ClientType is CONSUMER"
       properties:
         firstName: { type: string, description: "Name of the borrower" }
         lastName: { type: string, description: "Last Name of the borrower" }
@@ -66,6 +67,7 @@ components:
     BusinessClientBase:
           type: object
           required: [companyName, companyRegistryCode, representativeName, representativeCode]
+      description: "Required when ClientType is BUSINESS_WITH_COLLATERAL"
           properties:
             companyName: { type: string, description: "Name of the borrower company" }
             companyRegistryCode: { type: string, description: "Company Registration Code" }
@@ -77,6 +79,7 @@ components:
         - $ref: '#/components/schemas/BusinessClientBase'
         - type: object
           required: [collateralValue, currency]
+          description: "Required when ClientType is BUSINESS_WITHOUT_COLLATERAL"
           properties:
             collateralValue: { type: string, description: "Collateral value for the loan" }
             currency: { type: string, example: "EUR", description: "Currency of Collateral" }
@@ -96,7 +99,8 @@ paths:
       description: >
         Registers a new loan in the Lendermarket system. You must provide either 
         consumer or business client details depending on the 'clientType'. 
-        The 'lenderLoanId' must be unique to your system.
+
+        Please click on the "try it" button to see the all possible ENUM values for the fields.
       tags: [Loan Management]
       security:
         - bearerAuth: []
@@ -117,16 +121,9 @@ paths:
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
                 schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
                 clientType: { $ref: '#/components/schemas/ClientType' }
-              oneOf:
-                - properties:
-                    clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
-                    businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
-                - properties:
-                    clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
-                    businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
-                - properties:
-                    clientType: { enum: [CONSUMER] }
-                    consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
+                consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
+                businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
+                businessClientWithCollateral: { $ref: '#/components/schemas/BusinessWithCollateral' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
