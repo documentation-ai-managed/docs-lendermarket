@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: Lendermarket API - Loan Originator
   version: 1.0.0
@@ -36,13 +36,10 @@ components:
 
     ClientType:
       type: string
-      oneOf:
-      - title: CONSUMER
-        const: CONSUMER
-      - title: BUSINESS_WITH_COLLATERAL
-        const: BUSINESS_WITH_COLLATERAL
-      - title: BUSINESS_WITHOUT_COLLATERAL
-        const: BUSINESS_WITHOUT_COLLATERAL
+      enum:
+        - CONSUMER
+        - BUSINESS_WITH_COLLATERAL
+        - BUSINESS_WITHOUT_COLLATERAL
 
     ScheduleType:
       type: string
@@ -116,6 +113,16 @@ paths:
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
                 schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
                 clientType: { $ref: '#/components/schemas/ClientType' }
+              oneOf:
+                - properties:
+                    clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
+                - properties:
+                    clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
+                - properties:
+                    clientType: { enum: [CONSUMER] }
+                    consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
