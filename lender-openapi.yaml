@@ -24,6 +24,13 @@ components:
         - BUSINESS_WITH_COLLATERAL
         - BUSINESS_WITHOUT_COLLATERAL
 
+    CreateLoanRequest:
+        type: object
+        required:
+          - clientType
+        properties:
+          clientType:
+            $ref: '#/components/schemas/ClientType'
 paths:
   /createLoan:
     post:
@@ -36,12 +43,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - clientType
-              properties:
-                clientType:
-                  $ref: '#/components/schemas/ClientType'
+              $ref: '#/components/schemas/CreateLoanRequest'
       responses:
         '201':
           description: Success
