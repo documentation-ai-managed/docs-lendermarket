@@ -27,11 +27,6 @@
                 "path": "api/lender/introduction"
               },
               {
-                "group": "Enpoints 2",
-                "pages": [],
-                "openapi": "lender-loan-api-openapi-v1.5.yaml"
-              },
-              {
                 "title": "Authorizaiton",
                 "path": "api/lender/authorizaiton"
               },
