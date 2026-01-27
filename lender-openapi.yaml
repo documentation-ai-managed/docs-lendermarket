@@ -16,9 +16,7 @@ components:
       scheme: bearer
       description: >
         Bearer authentication of the form Bearer <token>, where token is your auth token.
-
   schemas:
-    # --- Generic Error Object ---
     ErrorResponse:
       type: object
       properties:
@@ -26,41 +24,52 @@ components:
           type: string
           example: "The selected schedule type is invalid."
 
-    # --- Reusable Components for Form Data ---
-    # Note: Nested objects in form-data are typically represented as 'object[property]'
     ScheduleItem:
       type: object
       required: [date, principalAmount, interestAmount]
       properties:
-        date: { type: string, format: date }
-        principalAmount: { type: string }
-        interestAmount: { type: string }
+        date:
+          type: string
+          format: date
+          description: Installment Date
+        principalAmount:
+          type: string
+          description: Principal Amount of the Loan
+        interestAmount:
+          type: string
+          description: Interest Amount of the Loan
 
-  responses:
-    # Standard Status Codes (Section 154)
-    BadRequest: { description: "Bad request" }
-    Unauthorized: { description: "Authentication failure" }
-    Forbidden: { description: "Forbidden" }
-    NotFound: { description: "Resource not found" }
-    Conflict: { description: "Conflict" }
-    ValidationError:
-      description: "Validation failed"
-      content:
-        application/json:
-          schema: { $ref: '#/components/schemas/ErrorResponse' }
-    ServerError: { description: "Internal Server Error" }
+    ConsumerClient:
+      type: object
+      required: [firstName, lastName, gender, personalCode]
+      properties:
+        firstName: { type: string, description: "Name of the borrower" }
+        lastName: { type: string, description: "Last Name of the borrower" }
+        gender: {type: string, enum: [MALE, FEMALE], description: "Gender of the borrower"}
+        personalCode: { type: string, description: "ID number of the borrower" }
+
+    BusinessClient:
+      type: object
+      required: [companyName, companyRegistryCode, representativeName, representativeCode, collateralValue, currency]
+      properties:
+        companyName: { type: string, description: "Name of the borrower company" }
+        companyRegistryCode: { type: string, description: "Company Registration Code" }
+        representativeName: { type: string, description: "Company Representative Full Name" }
+        representativeCode: { type: string, description: "ID number of Company Representative" }
+        collateralValue: { type: string, "Collateral value for the loan" }
+        currency: { type: string, example: "EUR", description: "Currency of Collateral" }
 
 paths:
   /createLoan:
     post:
       summary: Create Loan
-      tags: [Loans]
+      tags: [Loan Management]
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required: [lenderLoanId, scheduleType, loanAmount, currency, interestRate, country, lenderIssueDate, clientType]
@@ -70,28 +79,39 @@ paths:
                 loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
                 currency: { type: string, enum: [EUR], description: "Current validation restricted to EUR" }
                 interestRate: { type: string, description: "Annual interest rate percentage" }
-                country: { type: string, description: "Loan Originator country (3 digit ISO code" }
+                country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side"  }
-                clientType: { type: string, enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL] }
-                # Nested fields for Consumer
-                "consumerClient[firstName]": { type: string }
-                "consumerClient[lastName]": { type: string }
-                "consumerClient[gender]": { type: string, enum: [MALE, FEMALE] }
-                "consumerClient[personalCode]": { type: string }
-                # Nested fields for Business
-                "businessClient[companyName]": { type: string }
-                "businessClient[companyRegistryCode]": { type: string }
-                "businessClient[representativeName]": { type: string }
-                "businessClient[representativeCode]": { type: string }
-                "businessClient[collateralValue]": { type: string }
-                "businessClient[currency]": { type: string }
-                # Schedule array
-                "schedule":
+                clientType:
+                  type: string
+                  enum: [CONSUMER, BUSINESS_WITH_COLLATERAL, BUSINESS_WITHOUT_COLLATERAL]
+                consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
+                businessClient: { $ref: '#/components/schemas/BusinessClient' }
+                schedule:
                   type: array
                   items: { $ref: '#/components/schemas/ScheduleItem' }
+            example:
+              lenderLoanId: "ABC-12345"
+              scheduleType: "FULL-BULLET"
+              loanAmount: "1000"
+              currency: "EUR"
+              interestRate: "14"
+              country: "EST"
+              lenderIssueDate: "2023-01-30"
+              clientType: "BUSINESS_WITH_COLLATERAL"
+              businessClient:
+                companyName: "XYZ-123 Limited"
+                companyRegistryCode: "98765-ZYX"
+                representativeName: "John Doe"
+                representativeCode: "654321-FED"
+                collateralValue: "1000"
+                currency: "EUR"
+              schedule:
+                - date: "2023-02-26"
+                  principalAmount: "500"
+                  interestAmount: "10.50"
       responses:
         '201':
-          description: "Success. Returns unique UUID for the loan."
+          description: Success
           content:
             application/json:
               example:
@@ -100,17 +120,7 @@ paths:
                   lenderLoanId: "ABC-12345"
                   status: "ACTIVE"
         '422':
-          description: >
-            Validation Failed. Possible messages:
-            - "The selected schedule type is invalid."
-            - "The selected business client.currency is invalid."
-            - "LenderloanId has already been taken."
-            - "The loan amount must be a number/greater than 0."
-            - "The interest rate must be a number/greater than 0."
-            - "The selected country is invalid."
-            - "The lender issue date is not a valid date."
-            - "The selected consumer client.gender is invalid."
-            - "The business client.collateral value must be a number."
+          description: Validation Failed
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -118,19 +128,22 @@ paths:
   /createLoanExtension:
     post:
       summary: Extend Loan
-      tags: [Extensions]
+      tags: [Loan Management]
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required: [loanUuid, daysToExtend]
               properties:
-                loanUuid: { type: string, format: uuid }
+                loanUuid: { type: string }
                 daysToExtend: { type: integer, minimum: 1 }
+            example:
+              loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              daysToExtend: 10
       responses:
         '200':
           description: OK
@@ -139,76 +152,90 @@ paths:
               example:
                 data:
                   uuid: "5bb85f64-5717-34533-b3fc-2c963f66afa6"
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                   extendedDays: 10
-                  paymentDate: "2023-02-26"
-        '422':
-          description: "Validation failed: The days to extend must be greater than 0."
 
   /createLoanBuyback:
     post:
       summary: Buyback Loan
-      tags: [Buybacks]
+      tags: [Loan Management]
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required: [loanUuid, reason]
               properties:
-                loanUuid: { type: string, format: uuid }
+                loanUuid: { type: string }
                 reason:
                   type: string
                   enum: [AGREEMENT_TERMINATION, AGREEMENT_PROLONGATION, AGREEMENT_AMENDMENT, EARLY_PAYMENT]
+            example:
+              loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              reason: "EARLY_PAYMENT"
       responses:
         '202':
-          description: "Accepted (queued for execution)"
+          description: Accepted (queued for execution)
           content:
             application/json:
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                   status: "SENDING"
-                  paymentDate: "2023-02-28"
-        '422':
-          description: "Validation failed: The loan uuid must be a valid UUID or selected reason is invalid."
+                  reason: "EARLY_PAYMENT"
 
   /payment:
     post:
       summary: Create Payment
-      description: >
-        Payments are distributed in order: Delayed Interest, Interest, Principal. 
-        You must send either 'paymentAmount' OR the specific breakdown. 
-        Providing all 4 fields (paymentAmount + breakdown) will result in an error.
-      tags: [Payments]
+      description: Either paymentAmount or specific breakdown (principal, interest, delayed interest) must be sent.
+      tags: [Financials]
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required: [loanUuid, currency]
               properties:
-                loanUuid: { type: string, format: uuid }
-                currency: { type: string, enum: [EUR] }
-                paymentAmount: { type: string, description: "Total sum of principal, interest, and delayed interest" }
+                loanUuid: { type: string }
+                currency: { type: string, default: "EUR" }
+                paymentAmount: { type: string }
                 principalAmount: { type: string }
                 interestAmount: { type: string }
                 delayedInterestAmount: { type: string }
+            examples:
+              RequestByTotal:
+                value:
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  paymentAmount: "482"
+                  currency: "EUR"
+              RequestByBreakdown:
+                value:
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  principalAmount: "444"
+                  interestAmount: "33"
+                  delayedInterestAmount: "5"
+                  currency: "EUR"
       responses:
         '201':
-          description: Payment processed successfully
-        '422':
-          description: "Validation failed: The loan uuid must be a valid UUID."
+          description: Success
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "1re85f64-5717-4562-b3fc-2c963f66afa6"
+                  principalAmount: "444"
+                  currency: "EUR"
 
   /getLoan:
     get:
       summary: View Loan Details
-      tags: [Loans]
+      tags: [Loan Management]
       security:
         - bearerAuth: []
       parameters:
@@ -217,7 +244,6 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: Success
@@ -227,10 +253,8 @@ paths:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                   status: "ACTIVE"
-                  remainingPrincipalAmount: "1000"
+                  interestRate: "14"
                   paymentSchedule:
                     - dueDate: "2023-02-26"
-                      outstandingPrincipalAmount: "0"
+                      totalPrincipalAmount: "1000"
                       paidPrincipalAmount: "500"
-        '422':
-          description: "Validation failed: The loan uuid must be a valid UUID."
