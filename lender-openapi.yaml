@@ -17,6 +17,23 @@ components:
       description: >
         Bearer authentication of the form Bearer <token>, where token is your auth token.
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The selected schedule type is invalid."
+
+    Gender:
+      type: string
+      enum: [MALE, FEMALE]
+      description: "Gender of the borrower"
+
+    Currency:
+      type: string
+      enum: [EUR]
+      description: "Current validation restricted to EUR"
+
     ClientType:
       type: string
       enum:
@@ -24,13 +41,54 @@ components:
         - BUSINESS_WITH_COLLATERAL
         - BUSINESS_WITHOUT_COLLATERAL
 
-    CreateLoanRequest:
-        type: object
-        required:
-          - clientType
-        properties:
-          clientType:
-            $ref: '#/components/schemas/ClientType'
+    ScheduleType:
+      type: string
+      enum: [ANNUITY, BULLET, FULL-BULLET, REGULAR]
+      description: "Schedule type of the loan"
+
+    ScheduleItem:
+      type: object
+      required: [date, principalAmount, interestAmount]
+      properties:
+        date: { type: string, format: date, description: "Installment Date" }
+        principalAmount: { type: string, description: "Principal Amount of the Loan" }
+        interestAmount: { type: string, description: "Interest Amount of the Loan" }
+
+    ConsumerClient:
+      type: object
+      required: [firstName, lastName, gender, personalCode]
+      properties:
+        firstName: { type: string, description: "Name of the borrower" }
+        lastName: { type: string, description: "Last Name of the borrower" }
+        gender: { $ref: '#/components/schemas/Gender' }
+        personalCode: { type: string, description: "ID number of the borrower" }
+
+    BusinessClientBase:
+          type: object
+          required: [companyName, companyRegistryCode, representativeName, representativeCode]
+          properties:
+            companyName: { type: string, description: "Name of the borrower company" }
+            companyRegistryCode: { type: string, description: "Company Registration Code" }
+            representativeName: { type: string, description: "Company Representative Full Name" }
+            representativeCode: { type: string, description: "ID number of Company Representative" }
+
+    BusinessWithCollateral:
+      allOf:
+        - $ref: '#/components/schemas/BusinessClientBase'
+        - type: object
+          required: [collateralValue, currency]
+          properties:
+            collateralValue: { type: string, description: "Collateral value for the loan" }
+            currency: { type: string, example: "EUR", description: "Currency of Collateral" }
+
+    BuybackReason:
+      type: string
+      enum:
+        - AGREEMENT_TERMINATION
+        - AGREEMENT_PROLONGATION
+        - AGREEMENT_AMENDMENT
+        - EARLY_PAYMENT
+
 paths:
   /createLoan:
     post:
@@ -43,7 +101,46 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLoanRequest'
+              type: object
+              required: [lenderLoanId, scheduleType, loanAmount, currency, interestRate, country, lenderIssueDate, clientType]
+              properties:
+                lenderLoanId: { type: string, description: "Unique Loan ID on lender side" }
+                scheduleType: { $ref: '#/components/schemas/ScheduleType' }
+                loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
+                currency: { $ref: '#/components/schemas/Currency'}
+                interestRate: { type: string, description: "Annual interest rate percentage" }
+                country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
+                lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on lender side" }
+                schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
+                clientType: { $ref: '#/components/schemas/ClientType' }
+              oneOf:
+                - properties:
+                    clientType: { enum: [BUSINESS_WITH_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
+                - properties:
+                    clientType: { enum: [BUSINESS_WITHOUT_COLLATERAL] }
+                    businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
+                - properties:
+                    clientType: { enum: [CONSUMER] }
+                    consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
+            example:
+              lenderLoanId: "ABC-12345"
+              scheduleType: "FULL-BULLET"
+              loanAmount: "1000"
+              currency: "EUR"
+              interestRate: "14"
+              country: "EST"
+              lenderIssueDate: "2023-01-30"
+              clientType: "BUSINESS_WITHOUT_COLLATERAL"
+              businessClient:
+                companyName: "XYZ-123 Limited"
+                companyRegistryCode: "98765-ZYX"
+                representativeName: "John Doe"
+                representativeCode: "654321-FED"
+              schedule:
+                - date: "2023-02-26"
+                  principalAmount: "500"
+                  interestAmount: "10.50"
       responses:
         '201':
           description: Success
@@ -54,3 +151,140 @@ paths:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                   lenderLoanId: "ABC-12345"
                   status: "ACTIVE"
+        '422':
+          description: Validation Failed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /createLoanExtension:
+    post:
+      summary: Extend Loan
+      tags: [Loan Management]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [loanUuid, daysToExtend]
+              properties:
+                loanUuid: { type: string }
+                daysToExtend: { type: integer, minimum: 1 }
+            example:
+              loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              daysToExtend: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "5bb85f64-5717-34533-b3fc-2c963f66afa6"
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  extendedDays: 10
+
+  /createLoanBuyback:
+    post:
+      summary: Buyback Loan
+      tags: [Loan Management]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [loanUuid, reason]
+              properties:
+                loanUuid: { type: string }
+                reason: { $ref: '#/components/schemas/BuybackReason' }
+            example:
+              loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              reason: "EARLY_PAYMENT"
+      responses:
+        '202':
+          description: Accepted (queued for execution)
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  status: "SENDING"
+                  reason: "EARLY_PAYMENT"
+
+  /payment:
+    post:
+      summary: Create Payment
+      description: Either paymentAmount or specific breakdown (principal, interest, delayed interest) must be sent.
+      tags: [Financials]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [loanUuid, currency]
+              properties:
+                loanUuid: { type: string }
+                currency: { type: string, default: "EUR" }
+                paymentAmount: { type: string }
+                principalAmount: { type: string }
+                interestAmount: { type: string }
+                delayedInterestAmount: { type: string }
+            examples:
+              RequestByTotal:
+                value:
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  paymentAmount: "482"
+                  currency: "EUR"
+              RequestByBreakdown:
+                value:
+                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  principalAmount: "444"
+                  interestAmount: "33"
+                  delayedInterestAmount: "5"
+                  currency: "EUR"
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "1re85f64-5717-4562-b3fc-2c963f66afa6"
+                  principalAmount: "444"
+                  currency: "EUR"
+
+  /getLoan:
+    get:
+      summary: View Loan Details
+      tags: [Loan Management]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: loanUuid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                data:
+                  uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  status: "ACTIVE"
+                  interestRate: "14"
+                  paymentSchedule:
+                    - dueDate: "2023-02-26"
+                      totalPrincipalAmount: "1000"
+                      paidPrincipalAmount: "500"
