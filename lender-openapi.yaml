@@ -36,10 +36,13 @@ components:
 
     ClientType:
       type: string
-      enum:
-        - CONSUMER
-        - BUSINESS_WITH_COLLATERAL
-        - BUSINESS_WITHOUT_COLLATERAL
+      oneOf:
+      - title: CONSUMER
+        const: CONSUMER
+      - title: BUSINESS_WITH_COLLATERAL
+        const: BUSINESS_WITH_COLLATERAL
+      - title: BUSINESS_WITHOUT_COLLATERAL
+        const: BUSINESS_WITHOUT_COLLATERAL
 
     ScheduleType:
       type: string
