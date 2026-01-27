@@ -123,20 +123,20 @@ paths:
                 businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
                 businessClientWithCollateral: { $ref: '#/components/schemas/BusinessWithCollateral' }
             example:
-              lenderLoanId: "ABC-12345",
-              scheduleType: "FULL-BULLET",
-              loanAmount: "500",
-              currency: "EUR",
-              interestRate: "14",
-              country: "EST",
-              lenderIssueDate: "2026-01-26",
-              clientType: "BUSINESS_WITH_COLLATERAL",
+              lenderLoanId: "ABC-12345"
+              scheduleType: "FULL-BULLET"
+              loanAmount: "500"
+              currency: "EUR"
+              interestRate: "14"
+              country: "EST"
+              lenderIssueDate: "2026-01-26"
+              clientType: "BUSINESS_WITH_COLLATERAL"
               businessClient:
                 companyName: "XYZ-123 Limited"
                 companyRegistryCode: "98765-ZYX"
                 representativeName: "John Doe"
                 representativePersonalCode: "654321-FED"
-                collateralValue: "1000",
+                collateralValue: "1000"
                 currency: "EUR"
               schedule:
                 - date: "2026-02-26"
