@@ -480,9 +480,7 @@ paths:
           description: Unprocessable Entity
           content:
             application/json:
-              schema: 
-                type: object
-                properties: { $ref: '#/components/schemas/UnprocessableEntity'}
+              schema: { $ref: '#/components/schemas/UnprocessableEntity'}
               example:
                 message: The loan uuid field is required. (and 2 more errors)
                 errors:
