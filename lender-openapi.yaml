@@ -301,7 +301,7 @@ paths:
         Extend the maturity dates of an existing loan’s installments on Lendermarket side.
 
         Loans can be only extended if at the point of createLoans the extensions have been allowed. 
-        Trying to extend loan that cant be extended will give `422 Erroe - Maximum number allowed extensions reached`,
+        Trying to extend loan that cant be extended will give `422 Error - Maximum number allowed extensions reached`,
 
         Please click on the **try it** button to see all the possible ENUM values for the fields.
       security:
