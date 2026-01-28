@@ -17,6 +17,12 @@ components:
       description: |
         Bearer authentication of the form **Bearer <token>**, where token is your auth token.
   schemas:
+    UnprocessableEntity: 
+      type: object
+      properties: 
+        message: { type: string, description: "General error message" }
+        errors: { type: object, description: "List of objects with detailed errors" }
+
     BorrowerGender:
       type: string
       enum:
@@ -474,6 +480,9 @@ paths:
           description: Unprocessable Entity
           content:
             application/json:
+              schema: 
+                type: object
+                properties: { $ref: '#/components/schemas/UnprocessableEntity'}
               example:
                 message: The loan uuid field is required. (and 2 more errors)
                 errors:
