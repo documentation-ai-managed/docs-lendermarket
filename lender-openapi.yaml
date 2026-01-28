@@ -59,7 +59,7 @@ components:
       required: [date, principalAmount, interestAmount]
       properties:
         dueDate: { type: string, format: date, description: "Extended date of the installment" }
-        accruedInterestAmount: '0.00'
+        accruedInterestAmount: { type: string, description: "" }
         totalPrincipalAmount: { type: string, description: "Total Principal Amount of the installment" }
         totalInterestAmount: { type: string, description: "Total Interest Amount of the installment" }
         totalDelayedInterestAmount: { type: string, description: "Total Delayed Interest Amount of the installment" }
