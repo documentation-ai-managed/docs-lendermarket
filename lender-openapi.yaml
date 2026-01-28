@@ -117,6 +117,16 @@ components:
         - AGREEMENT_PROLONGATION
         - AGREEMENT_AMENDMENT
         - EARLY_PAYMENT
+      description: "Reason of the buyback"
+
+    BuybackStatus:
+      type: string
+      enum:
+        - FAILED
+        - PENDING
+        - SENDING
+        - SENT
+      description: "Status of the buyback"
 
 paths:
   /createLoan:
@@ -175,7 +185,7 @@ paths:
                 type: object
                 properties:
                   uuid: { type: string, description: "Unique UUID of loan in the LM system" }
-                  loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable" }
+                  loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable ID of the extension" }
                   lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
                   scheduleType: { $ref: '#/components/schemas/ScheduleType' }
                   loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
@@ -289,15 +299,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  uuid: { type: string, description: "Unique ID of the extension" }
-                  loanUuid: { type: string, description: "Loan ID in the Lendermarket system" }
+                  uuid: { type: string, description: "Unique UUID of the extension" }
+                  loanUuid: { type: string, description: "Loan UUID in the Lendermarket system" }
                   extendedDays: { type: string, description: "Total number of days that all remaining installments were extended by" }
                   paymentDate: { type: string, description: "Extension Date. Also the date all accrued interest and delayed interest amount are paid." }
                   paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
-                  uuid: a49c2469-0537-48a1-aa0e-82ab32a157ac
-                  loanUuid: dcb87579-8d5e-412a-9f71-7c46c72ed589
+                  uuid: "a49c2469-0537-48a1-aa0e-82ab32a157ac"
+                  loanUuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
                   extendedDays: 30
                   paymentDate: '2026-01-28'
                   paymentSchedule:
@@ -338,7 +348,10 @@ paths:
   /createLoanBuyback:
     post:
       summary: Buyback Loan
-      tags: [Loan Management]
+      description: |
+        Create a buyback request for a existing loan which is not bought back already.
+
+        Please click on the **try it** button to see all the possible ENUM values for the fields.
       security:
         - bearerAuth: []
       requestBody:
@@ -349,21 +362,40 @@ paths:
               type: object
               required: [loanUuid, reason]
               properties:
-                loanUuid: { type: string }
+                loanUuid: { type: string, description: "Loan UUID in the Lendermarket system" }
                 reason: { $ref: '#/components/schemas/BuybackReason' }
             example:
               loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
               reason: "EARLY_PAYMENT"
       responses:
-        '202':
-          description: Accepted (queued for execution)
+        '201':
+          description: Created
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  uuid: { type: string, description: "Unique UUID of the buyback" }
+                  paymentDate: { type: string, format: date, description: "Buyback Date. Also the date all principal, interest and delayed interest amount are paid." }
+                  status: { $ref: '#/components/schemas/BuybackStatus' }
+                  reason: { $ref: '#/components/schemas/BuybackReason' }
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  paymentDate: "2026-01-28",
                   status: "SENDING"
                   reason: "EARLY_PAYMENT"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              example:
+                message: The loan uuid field is required. (and 1 more error)
+                errors:
+                  loanUuid:
+                  - The loan uuid field is required.
+                  reason:
+                  - The reason field is required.
 
   /payment:
     post:
