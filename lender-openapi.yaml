@@ -163,12 +163,17 @@ paths:
           description: Created
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  uuid: { type: string, description: "Unique ID of the extension" }
+                  paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
-                  uuid: dcb87579-8d5e-412a-9f71-7c46c72ed589
-                  loanPublicId: 2W69YH87AU6E
-                  lenderLoanId: ABC-12345
-                  scheduleType: FULL-BULLET
+                  uuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
+                  loanPublicId: "2W69YH87AU6E"
+                  lenderLoanId: "ABC-12345"
+                  scheduleType: "FULL-BULLET"
                   loanAmount: '1000.00'
                   remainingPrincipalAmount: '1000.00'
                   remainingSkinAmount: '50.00'
