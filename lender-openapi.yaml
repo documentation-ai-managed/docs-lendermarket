@@ -17,21 +17,17 @@ components:
       description: |
         Bearer authentication of the form **Bearer <token>**, where token is your auth token.
   schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        message:
-          type: string
-          example: "The selected schedule type is invalid."
-
-    Gender:
+    BorrowerGender:
       type: string
-      enum: [MALE, FEMALE]
+      enum:
+        - MALE
+        - FEMALE
       description: "Gender of the borrower"
 
     Currency:
       type: string
-      enum: [EUR]
+      enum:
+        - EUR
       description: "Current validation restricted to `EUR`"
 
     ClientType:
@@ -43,7 +39,11 @@ components:
 
     ScheduleType:
       type: string
-      enum: [ANNUITY, BULLET, FULL-BULLET, REGULAR]
+      enum:
+        - ANNUITY
+        - BULLET
+        - FULL-BULLET
+        - REGULAR
       description: "Schedule type of the loan"
 
     LoanScheduleItem:
@@ -59,7 +59,7 @@ components:
       required: [date, principalAmount, interestAmount]
       properties:
         dueDate: { type: string, format: date, description: "Extended date of the installment" }
-        accruedInterestAmount: { type: string, description: "" }
+        accruedInterestAmount: { type: string, description: "Installment interest accrued as of today" }
         totalPrincipalAmount: { type: string, description: "Total Principal Amount of the installment" }
         totalInterestAmount: { type: string, description: "Total Interest Amount of the installment" }
         totalDelayedInterestAmount: { type: string, description: "Total Delayed Interest Amount of the installment" }
@@ -77,7 +77,7 @@ components:
       properties:
         firstName: { type: string, description: "Name of the borrower" }
         lastName: { type: string, description: "Last Name of the borrower" }
-        gender: { $ref: '#/components/schemas/Gender' }
+        gender: { $ref: '#/components/schemas/BorrowerGender' }
         personalCode: { type: string, description: "ID number of the borrower" }
 
     BusinessClientBase:
@@ -167,6 +167,25 @@ paths:
                 type: object
                 properties:
                   uuid: { type: string, description: "Unique ID of the extension" }
+                  loanPublicId: 9VER79539RL5
+                  lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
+                  scheduleType: { $ref: '#/components/schemas/ScheduleType' }
+                  loanAmount: '1000.00'
+                  remainingPrincipalAmount: '1000.00'
+                  remainingSkinAmount: '50.00'
+                  investedAmount: '0.00'
+                  lenderSkinPercentage: '5.00'
+                  buyback: 
+                  currency: EUR
+                  status: ACTIVATING
+                  totalTermInDays: 365
+                  remainingTermInDays: 363
+                  interestRate: '14.00'
+                  country: EST
+                  lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
+                  finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
+                  createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
+                  limitCustomerTypes: { type: string, description: "" }
                   paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
