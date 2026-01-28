@@ -382,7 +382,7 @@ paths:
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  paymentDate: "2026-01-28",
+                  paymentDate: "2026-01-28"
                   status: "SENDING"
                   reason: "EARLY_PAYMENT"
         '422':
