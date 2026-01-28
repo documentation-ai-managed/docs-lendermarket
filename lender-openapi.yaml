@@ -24,6 +24,10 @@ components:
         - FEMALE
       description: "Gender of the borrower"
 
+    LoanUuid:
+      type: string
+      description: "Unique UUID of the loan in the LM system" 
+
     Currency:
       type: string
       enum:
@@ -108,7 +112,7 @@ components:
         representativeName: { type: string, description: "Company Representative Full Name" }
         representativePersonalCode: { type: string, description: "ID number of Company Representative" }
         collateralValue: { type: string, description: "Collateral value for the loan" }
-        currency: { type: string, example: "EUR", description: "Currency of Collateral" }
+        currency: { $ref: '#/components/schemas/Currency'}
 
     BuybackReason:
       type: string
@@ -184,27 +188,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  uuid: { type: string, description: "Unique UUID of loan in the LM system" }
-                  loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable ID of the extension" }
-                  lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
-                  scheduleType: { $ref: '#/components/schemas/ScheduleType' }
-                  loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
-                  remainingPrincipalAmount: { type: string, description: "Remaining principal amount including the Loan Originator´s skin" }
-                  remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
-                  investedAmount: { type: string, description: "Remaining investor invested amount" }
-                  lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
-                  buyback: { type: string, description: "" }
-                  currency: { $ref: '#/components/schemas/Currency'}
-                  status: { $ref: '#/components/schemas/LoanStatus' }
-                  totalTermInDays: { type: integer, description: "Loan’s total term in days" }
-                  remainingTermInDays: { type: integer, description: "Loan’s total remaining term in days" }
-                  interestRate: { type: string, description: "Annual interest rate percentage" }
-                  country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
-                  lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
-                  finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
-                  createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
-                  limitCustomerTypes: { type: string, description: "" }
-                  paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
+                  data:
+                    type: object
+                    properties:
+                      uuid: { $ref: '#/components/schemas/LoanUuid'}
+                      loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable ID of the extension" }
+                      lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
+                      scheduleType: { $ref: '#/components/schemas/ScheduleType' }
+                      loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
+                      remainingPrincipalAmount: { type: string, description: "Remaining principal amount including the Loan Originator´s skin" }
+                      remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
+                      investedAmount: { type: string, description: "Remaining investor invested amount" }
+                      lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
+                      buyback: { type: string, description: "" }
+                      currency: { $ref: '#/components/schemas/Currency'}
+                      status: { $ref: '#/components/schemas/LoanStatus' }
+                      totalTermInDays: { type: integer, description: "Loan’s total term in days" }
+                      remainingTermInDays: { type: integer, description: "Loan’s total remaining term in days" }
+                      interestRate: { type: string, description: "Annual interest rate percentage" }
+                      country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
+                      lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
+                      finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
+                      createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
+                      limitCustomerTypes: { type: string, description: "" }
+                      paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
                   uuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
@@ -286,7 +293,7 @@ paths:
               type: object
               required: [loanUuid, daysToExtend]
               properties:
-                loanUuid: { type: string, description: "Loan ID in the Lendermarket system" }
+                loanUuid: { $ref: '#/components/schemas/LoanUuid'}
                 daysToExtend: { type: integer, minimum: 1, description: "Total number of days that all remaining installments will be extended by" }
             example:
               loanUuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
@@ -299,11 +306,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  uuid: { type: string, description: "Unique UUID of the extension" }
-                  loanUuid: { type: string, description: "Loan UUID in the Lendermarket system" }
-                  extendedDays: { type: string, description: "Total number of days that all remaining installments were extended by" }
-                  paymentDate: { type: string, description: "Extension Date. Also the date all accrued interest and delayed interest amount are paid." }
-                  paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
+                  data:
+                    type: object
+                    properties:
+                      uuid: { type: string, description: "Unique UUID of the extension" }
+                      loanUuid: { $ref: '#/components/schemas/LoanUuid'}
+                      extendedDays: { type: string, description: "Total number of days that all remaining installments were extended by" }
+                      paymentDate: { type: string, description: "Extension Date. Also the date all accrued interest and delayed interest amount are paid." }
+                      paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
                   uuid: "a49c2469-0537-48a1-aa0e-82ab32a157ac"
@@ -362,7 +372,7 @@ paths:
               type: object
               required: [loanUuid, reason]
               properties:
-                loanUuid: { type: string, description: "Loan UUID in the Lendermarket system" }
+                loanUuid: { $ref: '#/components/schemas/LoanUuid'}
                 reason: { $ref: '#/components/schemas/BuybackReason' }
             example:
               loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -375,10 +385,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  uuid: { type: string, description: "Unique UUID of the buyback" }
-                  paymentDate: { type: string, format: date, description: "Buyback Date. Also the date all principal, interest and delayed interest amount are paid." }
-                  status: { $ref: '#/components/schemas/BuybackStatus' }
-                  reason: { $ref: '#/components/schemas/BuybackReason' }
+                  data:
+                    type: object
+                    properties:
+                      uuid: { type: string, description: "Unique UUID of the buyback" }
+                      paymentDate: { type: string, format: date, description: "Buyback Date. Also the date all principal, interest and delayed interest amount are paid." }
+                      status: { $ref: '#/components/schemas/BuybackStatus' }
+                      reason: { $ref: '#/components/schemas/BuybackReason' }
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -397,11 +410,19 @@ paths:
                   reason:
                   - The reason field is required.
 
-  /payment:
+  /createLoanPayment:
     post:
       summary: Create Payment
-      description: Either paymentAmount or specific breakdown (principal, interest, delayed interest) must be sent.
-      tags: [Financials]
+      description: |
+        Create payment for a existing loan.
+
+        Earliest claims will always be paid first.
+        
+        Loan payments will be distributed by following order; `DELAYED_INTEREST`, `INTEREST`, `PRINCIPAL`.
+        
+        In the case of overpayment, the overpaid amount will go towards the next claim. In case there are no future claims only the owed part is taken from the payment and remainder of overpayment is given back in response.
+
+        Partial payments minimum amount is determined by the loans given currencies minor unit. In the case of EUR it would be 0.01.  .
       security:
         - bearerAuth: []
       requestBody:
@@ -410,37 +431,58 @@ paths:
           application/json:
             schema:
               type: object
-              required: [loanUuid, currency]
+              required: [loanUuid, currency, paymentAmount]
               properties:
-                loanUuid: { type: string }
-                currency: { type: string, default: "EUR" }
-                paymentAmount: { type: string }
-                principalAmount: { type: string }
-                interestAmount: { type: string }
-                delayedInterestAmount: { type: string }
+                loanUuid: { $ref: '#/components/schemas/LoanUuid'}
+                paymentAmount: { type: string, description: "Total amount (Principal, Interest, Delayed Interest) that will be paid" }
+                currency: { $ref: '#/components/schemas/Currency'}
             examples:
               RequestByTotal:
                 value:
                   loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                   paymentAmount: "482"
                   currency: "EUR"
-              RequestByBreakdown:
-                value:
-                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  principalAmount: "444"
-                  interestAmount: "33"
-                  delayedInterestAmount: "5"
-                  currency: "EUR"
       responses:
         '201':
           description: Success
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      uuid: { type: string, description: "Unique UUID of the payment" }
+                      loanUuid: { $ref: '#/components/schemas/LoanUuid'}
+                      principalAmount: { type: string, description: "Principal Amount that was paid" }
+                      interestAmount: { type: string, description: "Interest Amount that was paid" }
+                      delayedInterestAmount: { type: string, description: "Delayed Interest Amount that was paid" }
+                      paymentDate: { type: string, description: "Payment Date. AThe date the payment was made" }
+                      currency: { $ref: '#/components/schemas/Currency'}
+
               example:
                 data:
-                  uuid: "1re85f64-5717-4562-b3fc-2c963f66afa6"
-                  principalAmount: "444"
+                  uuid: "941dfdfc-65ff-43d8-aba8-5a395bdd7433"
+                  loanUuid: "853dffbc-2997-4f2b-b236-af3f766d3fde"
+                  principalAmount: '10.00'
+                  interestAmount: '0.00'
+                  delayedInterestAmount: '0.00'
+                  paymentDate: '2026-01-28'
                   currency: "EUR"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              example:
+                message: The loan uuid field is required. (and 2 more errors)
+                errors:
+                  loanUuid:
+                  - The loan uuid field is required.
+                  paymentAmount:
+                  - The payment amount field is required.
+                  currency:
+                  - The currency field is required.
 
   /getLoan:
     get:
