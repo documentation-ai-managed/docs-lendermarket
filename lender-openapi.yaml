@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Lendermarket API - Loan Originator
   version: 1.0.0
@@ -64,6 +64,14 @@ components:
         - REGULAR
       description: "Schedule type of the loan"
 
+    BuyBackProperties: 
+      type: ["object", "null"]
+      properties:
+        uuid: { type: string, description: "Unique UUID of the buyback" }
+        paymentDate: { type: string, format: date, description: "Buyback Date. Also the date all principal, interest and delayed interest amount are paid." }
+        status: { $ref: '#/components/schemas/BuybackStatus' }
+        reason: { $ref: '#/components/schemas/BuybackReason' }
+
     Loan: 
       type: object
       properties: 
@@ -76,7 +84,7 @@ components:
         remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
         investedAmount: { type: string, description: "Remaining investor invested amount" }
         lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
-        buyback: { type: string, description: "" }
+        buyback: { $ref: '#/components/schemas/BuyBackProperties' }
         currency: { $ref: '#/components/schemas/Currency'}
         status: { $ref: '#/components/schemas/LoanStatus' }
         totalTermInDays: { type: integer, description: "Loan’s total term in days" }
@@ -86,7 +94,7 @@ components:
         lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
         finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
         createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
-        limitCustomerTypes: { type: string, description: "" }
+        limitCustomerTypes: { type: ['null', string], description: "`['VIP']` or `['REGULAR']` or `['VIP', 'REGULAR']`" }
         paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
         allowedInvestmentSources: { type: array, items: {}, description: "`['MANUAL']` or `['AUTOINVEST']` or `['MANUAL', 'AUTOINVEST']`"}
 
@@ -396,13 +404,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: object
-                    properties:
-                      uuid: { type: string, description: "Unique UUID of the buyback" }
-                      paymentDate: { type: string, format: date, description: "Buyback Date. Also the date all principal, interest and delayed interest amount are paid." }
-                      status: { $ref: '#/components/schemas/BuybackStatus' }
-                      reason: { $ref: '#/components/schemas/BuybackReason' }
+                  data: { $ref: '#/components/schemas/BuyBackProperties' }
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
