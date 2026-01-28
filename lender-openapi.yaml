@@ -46,13 +46,29 @@ components:
       enum: [ANNUITY, BULLET, FULL-BULLET, REGULAR]
       description: "Schedule type of the loan"
 
-    ScheduleItem:
+    LoanScheduleItem:
       type: object
       required: [date, principalAmount, interestAmount]
       properties:
         date: { type: string, format: date, description: "Installment Date" }
         principalAmount: { type: string, description: "Principal Amount of the Loan" }
         interestAmount: { type: string, description: "Interest Amount of the Loan" }
+
+    PaymentScheduleItem:
+      type: object
+      required: [date, principalAmount, interestAmount]
+      properties:
+        dueDate: { type: string, format: date, description: "Extended date of the installment" }
+        accruedInterestAmount: '0.00'
+        totalPrincipalAmount: { type: string, description: "Total Principal Amount of the installment" }
+        totalInterestAmount: { type: string, description: "Total Interest Amount of the installment" }
+        totalDelayedInterestAmount: { type: string, description: "Total Delayed Interest Amount of the installment" }
+        outstandingPrincipalAmount: { type: string, description: "Outstanding (not paid yet) Principal Amount of the installment" }
+        outstandingInterestAmount: { type: string, description: "Outstanding (not paid yet) Interest Amount of the installment" }
+        outstandingDelayedInterestAmount: { type: string, description: "Outstanding (not paid yet) Delayed Interest Amount of the installment" }
+        paidPrincipalAmount: { type: string, description: "Paid Principal Amount of the installment" }
+        paidInterestAmount: { type: string, description: "Paid Interest Amount of the installment" }
+        paidDelayedInterestAmount: { type: string, description: "Paid Delayed Interest Amount of the installment" }
 
     ConsumerClient:
       type: object
@@ -117,7 +133,7 @@ paths:
                 interestRate: { type: string, description: "Annual interest rate percentage" }
                 country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
                 lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
-                schedule: { type: array, items: { $ref: '#/components/schemas/ScheduleItem' }}
+                schedule: { type: array, items: { $ref: '#/components/schemas/LoanScheduleItem' }}
                 clientType: { $ref: '#/components/schemas/ClientType' }
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
                 businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
@@ -168,17 +184,17 @@ paths:
                   lenderIssueDate: '2026-01-26'
                   finalPaymentDate: '2027-01-26'
                   paymentSchedule:
-                  - dueDate: '2027-01-26'
-                    accruedInterestAmount: '0.00'
-                    totalPrincipalAmount: '1000.00'
-                    totalInterestAmount: '141.16'
-                    totalDelayedInterestAmount: '0.00'
-                    outstandingPrincipalAmount: '1000.00'
-                    outstandingInterestAmount: '141.16'
-                    outstandingDelayedInterestAmount: '0.00'
-                    paidPrincipalAmount: '0.00'
-                    paidInterestAmount: '0.00'
-                    paidDelayedInterestAmount: '0.00'
+                    - dueDate: '2027-01-26'
+                      accruedInterestAmount: '0.00'
+                      totalPrincipalAmount: '1000.00'
+                      totalInterestAmount: '141.16'
+                      totalDelayedInterestAmount: '0.00'
+                      outstandingPrincipalAmount: '1000.00'
+                      outstandingInterestAmount: '141.16'
+                      outstandingDelayedInterestAmount: '0.00'
+                      paidPrincipalAmount: '0.00'
+                      paidInterestAmount: '0.00'
+                      paidDelayedInterestAmount: '0.00'
                   createdAt: '2026-01-28 06:02:16'
                   allowedInvestmentSources:
                     - MANUAL
@@ -243,6 +259,9 @@ paths:
                 properties:
                   uuid: { type: string, description: "Unique ID of the extension" }
                   loanUuid: { type: string, description: "Loan ID in the Lendermarket system" }
+                  extendedDays: { type: string, description: "Total number of days that all remaining installments were extended by" }
+                  paymentDate: { type: string, description: "Extension Date. Also the date all accrued interest and delayed interest amount are paid." }
+                  paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
               example:
                 data:
                   uuid: a49c2469-0537-48a1-aa0e-82ab32a157ac
