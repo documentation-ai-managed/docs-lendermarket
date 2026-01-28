@@ -189,20 +189,27 @@ paths:
           content:
             application/json:
               example:
-                message: The lender loan id has already been taken. (and 5 more errors)
+                message: The lender loan id field is required. (and 8 more errors)
                 errors:
                   lenderLoanId:
-                  - The lender loan id has already been taken.
+                    - The lender loan id field is required.
+                  scheduleType:
+                    - The schedule type field is required.
+                  loanAmount:
+                    - The loan amount field is required.
                   currency:
-                  - The currency field is required.
+                    - The currency field is required.
                   interestRate:
-                  - The interest rate field is required.
+                    - The interest rate field is required.
                   country:
-                  - The country field is required.
+                    - The country field is required.
                   lenderIssueDate:
-                  - The lender issue date field is required.
+                    - The lender issue date field is required.
+                  schedule:
+                    - The schedule field is required.
                   clientType:
-                  - The client type field is required.
+                    - The client type field is required.
+
 
   /createLoanExtension:
     post:
