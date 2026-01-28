@@ -228,16 +228,21 @@ paths:
               type: object
               required: [loanUuid, daysToExtend]
               properties:
-                loanUuid: { type: string }
-                daysToExtend: { type: integer, minimum: 1 }
+                loanUuid: { type: string, description: "Loan ID in the Lendermarket system" }
+                daysToExtend: { type: integer, minimum: 1, description: "Total number of days that all remaining installments will be extended by" }
             example:
               loanUuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
               daysToExtend: 30
       responses:
-        '200':
+        '201':
           description: Created
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  uuid: { type: string, description: "Unique ID of the extension" }
+                  loanUuid: { type: string, description: "Loan ID in the Lendermarket system" }
               example:
                 data:
                   uuid: a49c2469-0537-48a1-aa0e-82ab32a157ac
