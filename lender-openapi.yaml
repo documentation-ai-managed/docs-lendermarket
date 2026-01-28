@@ -37,6 +37,14 @@ components:
         - BUSINESS_WITH_COLLATERAL
         - BUSINESS_WITHOUT_COLLATERAL
 
+    LoanStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACTIVATING
+        - ACTIVE
+        - FINISHED
+
     ScheduleType:
       type: string
       enum:
@@ -166,22 +174,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  uuid: { type: string, description: "Unique ID of the extension" }
-                  loanPublicId: 9VER79539RL5
+                  uuid: { type: string, description: "Unique UUID of loan in the LM system" }
+                  loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable" }
                   lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
                   scheduleType: { $ref: '#/components/schemas/ScheduleType' }
-                  loanAmount: '1000.00'
-                  remainingPrincipalAmount: '1000.00'
-                  remainingSkinAmount: '50.00'
-                  investedAmount: '0.00'
-                  lenderSkinPercentage: '5.00'
-                  buyback: 
-                  currency: EUR
-                  status: ACTIVATING
-                  totalTermInDays: 365
-                  remainingTermInDays: 363
-                  interestRate: '14.00'
-                  country: EST
+                  loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
+                  remainingPrincipalAmount: { type: string, description: "Remaining principal amount including the Loan Originator´s skin" }
+                  remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
+                  investedAmount: { type: string, description: "Remaining investor invested amount" }
+                  lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
+                  buyback: { type: string, description: "" }
+                  currency: { $ref: '#/components/schemas/Currency'}
+                  status: { $ref: '#/components/schemas/LoanStatus' }
+                  totalTermInDays: { type: integer, description: "Loan’s total term in days" }
+                  remainingTermInDays: { type: integer, description: "Loan’s total remaining term in days" }
+                  interestRate: { type: string, description: "Annual interest rate percentage" }
+                  country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
                   lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
                   finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
                   createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
