@@ -1,6 +1,25 @@
 ---
-title: Lender Loan API introduction
+title: Loan Originator API introduction
 ---
-The Lender Loan API service is used by Lendermarket Loan Originators to create, extend, buyback loans, make payments and view loans whenever they require. Once the API is called by the client, LM will validate and authorize the client and return the necessary information based on the level of access they have and the method they use. The response will be in **JSON** format by default.
+The **Lendermarket Loan Originator API** is a RESTful service designed to allow Loan Originators to manage the full lifecycle of their loan assets on the Lendermarket platform. This interface enables to programmatically create, extend, and buy back loans, as well as record payments and retrieve real-time loan status.
 
-There will be only one web service URL exposed and that particular web service will have various methods for clients to decide and call based on the data they require and the transactions they want to create.
+### Core Capabilities
+
+- **Loan Lifecycle Management:** Seamlessly create new loans for various client types (Consumer or Business) and manage maturity dates via the extension endpoint.
+
+- **Transaction Processing:** Initiate buyback requests and report loan payments. Payments are automatically distributed according to a predefined priority: `DELAYED_INTEREST`, `INTEREST`, and then `PRINCIPAL`.
+
+- **Data Retrieval:** Access detailed information on any loan, including remaining principal, invested amounts, and the full payment schedule, using its unique UUID.
+
+### Security and Protocol
+
+To ensure data integrity and security, all requests must be authorized using **Bearer Authentication**. The API communicates exclusively in **JSON format** for both requests and responses.
+
+### Environment URLs
+
+Lendermarket provides two distinct environments for integration and live operations:
+
+- **TEST (Staging):** `https://api.lendermarket.dev/claims/v1/lender/`
+
+- **PROD (Production):** `https://api.lendermarket.com/claims/v1/lender/`
+

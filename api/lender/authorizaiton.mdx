@@ -1,17 +1,23 @@
 ---
 title: Authorization
 ---
-When the client requires data from Lendermarket, the client will establish a connection to the Lender Loan API by calling the Loan API URL link and passing the user credentials.&#x20;
+Security is handled through a combination of credential validation and network restrictions to ensure that only authorized Loan Originators can access sensitive data.
 
-The Lender Loan API will check the credentials. Every lender will have a unique “Authorization Key” which will be provided by the LM team. So they can use this key to send API requests. Authorization type will be Bearer Token.
+### Authentication Protocol
 
-Moreover, LM will also check the lender's IP. Lenders should call Loan API from a static IP so LM can whitelist this IP and not change it frequently.&#x20;
+- **Bearer Token:** The API uses **Bearer Authentication** for all requests.
 
-*(For test environment, there is no IP control)*
+- **Authorization Key:** Every loan originator is assigned a unique “Authorization Key” provided by the Lendermarket team.
 
-### Environment URLs
+- **Header Format:** This key must be passed in the request header as: \``Authorization: Bearer <token>`\`.
 
-- **TEST** - <a href="https://api.lendermarket.dev/claims/v1/lender/" target="_blank" rel="noopener noreferrer">https\://api.lendermarket.dev/claims/v1/lender/</a>
+- **Credential Verification:** Upon receiving a call, the API validates the provided credentials before authorizing the method and returning data.
 
-- **PROD** - <a href="https://api.lendermarket.com/claims/v1/lender/" target="_blank" rel="noopener noreferrer">https\://api.lendermarket.com/claims/v1/lender/</a>
+### IP Whitelisting
+
+To provide an additional layer of security, Lendermarket uses IP-based access control:
+
+- **Static IP Requirement:** Loan originators must call the **API** from a **static IP address**.
+
+- **Whitelisting:** Lendermarket will whitelist this specific IP to prevent unauthorized access from other locations provided during the onboarding process.
 
