@@ -20,7 +20,7 @@
         "icon": "code",
         "groups": [
           {
-            "group": "Lender Loan API",
+            "group": "Loan Originator API",
             "pages": [
               {
                 "title": "Introduction",
