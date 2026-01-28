@@ -519,13 +519,41 @@ paths:
                   data: { $ref: '#/components/schemas/Loan'}
               example:
                 data:
-                  uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  status: "ACTIVE"
-                  interestRate: "14"
+                  uuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
+                  loanPublicId: "2W69YH87AU6E"
+                  lenderLoanId: "ABC-12345"
+                  scheduleType: "FULL-BULLET"
+                  loanAmount: '1000.00'
+                  remainingPrincipalAmount: '1000.00'
+                  remainingSkinAmount: '50.00'
+                  investedAmount: '0.00'
+                  lenderSkinPercentage: '5.00'
+                  buyback: null
+                  currency: EUR
+                  status: ACTIVATING
+                  totalTermInDays: 365
+                  remainingTermInDays: 363
+                  interestRate: '14.00'
+                  country: EST
+                  lenderIssueDate: '2026-01-26'
+                  finalPaymentDate: '2027-01-26'
                   paymentSchedule:
-                    - dueDate: "2023-02-26"
-                      totalPrincipalAmount: "1000"
-                      paidPrincipalAmount: "500"
+                    - dueDate: '2027-01-26'
+                      accruedInterestAmount: '0.00'
+                      totalPrincipalAmount: '1000.00'
+                      totalInterestAmount: '141.16'
+                      totalDelayedInterestAmount: '0.00'
+                      outstandingPrincipalAmount: '1000.00'
+                      outstandingInterestAmount: '141.16'
+                      outstandingDelayedInterestAmount: '0.00'
+                      paidPrincipalAmount: '0.00'
+                      paidInterestAmount: '0.00'
+                      paidDelayedInterestAmount: '0.00'
+                  createdAt: '2026-01-28 06:02:16'
+                  allowedInvestmentSources:
+                    - MANUAL
+                    - AUTOINVEST
+                  limitCustomerTypes: null
         '422':
           description: Unprocessable Entity
           content:
