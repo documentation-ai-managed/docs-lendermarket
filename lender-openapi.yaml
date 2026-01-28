@@ -88,7 +88,7 @@ components:
         createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
         limitCustomerTypes: { type: string, description: "" }
         paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
-        allowedInvestmentSources: { type: array, items: {}, description: "`MANUAL` or `AUTOINVEST` or both"}
+        allowedInvestmentSources: { type: array, items: {}, description: "`['MANUAL']` or `['AUTOINVEST']` or `['MANUAL', 'AUTOINVEST']`"}
 
     LoanScheduleItem:
       type: object
