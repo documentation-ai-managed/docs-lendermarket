@@ -214,7 +214,10 @@ paths:
   /createLoanExtension:
     post:
       summary: Extend Loan
-      tags: [Loan Management]
+      description: |
+        Extend the maturity dates of an existing loan’s installments on Lendermarket side.
+
+        Please click on the **try it** button to see all the possible ENUM values for the fields.
       security:
         - bearerAuth: []
       requestBody:
@@ -228,18 +231,53 @@ paths:
                 loanUuid: { type: string }
                 daysToExtend: { type: integer, minimum: 1 }
             example:
-              loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-              daysToExtend: 10
+              loanUuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
+              daysToExtend: 30
       responses:
         '200':
-          description: OK
+          description: Created
           content:
             application/json:
               example:
                 data:
-                  uuid: "5bb85f64-5717-34533-b3fc-2c963f66afa6"
-                  loanUuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  extendedDays: 10
+                  uuid: a49c2469-0537-48a1-aa0e-82ab32a157ac
+                  loanUuid: dcb87579-8d5e-412a-9f71-7c46c72ed589
+                  extendedDays: 30
+                  paymentDate: '2026-01-28'
+                  paymentSchedule:
+                    - dueDate: '2027-01-26'
+                      accruedInterestAmount: '0.00'
+                      totalPrincipalAmount: '0.00'
+                      totalInterestAmount: '0.00'
+                      totalDelayedInterestAmount: '0.00'
+                      outstandingPrincipalAmount: '0.00'
+                      outstandingInterestAmount: '0.00'
+                      outstandingDelayedInterestAmount: '0.00'
+                      paidPrincipalAmount: '0.00'
+                      paidInterestAmount: '0.00'
+                      paidDelayedInterestAmount: '0.00'
+                    - dueDate: '2027-02-25'
+                      accruedInterestAmount: '0.00'
+                      totalPrincipalAmount: '1000.00'
+                      totalInterestAmount: '152.83'
+                      totalDelayedInterestAmount: '0.00'
+                      outstandingPrincipalAmount: '1000.00'
+                      outstandingInterestAmount: '152.83'
+                      outstandingDelayedInterestAmount: '0.00'
+                      paidPrincipalAmount: '0.00'
+                      paidInterestAmount: '0.00'
+                      paidDelayedInterestAmount: '0.00'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              example:
+                message: The loan uuid field is required. (and 1 more error)
+                errors:
+                  loanUuid:
+                  - The loan uuid field is required.
+                  daysToExtend:
+                  - The days to extend field is required.
 
   /createLoanBuyback:
     post:
