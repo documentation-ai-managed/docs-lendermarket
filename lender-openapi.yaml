@@ -64,6 +64,32 @@ components:
         - REGULAR
       description: "Schedule type of the loan"
 
+    Loan: 
+      type: object
+      properties: 
+        uuid: { $ref: '#/components/schemas/LoanUuid'}
+        loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable ID of the extension" }
+        lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
+        scheduleType: { $ref: '#/components/schemas/ScheduleType' }
+        loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
+        remainingPrincipalAmount: { type: string, description: "Remaining principal amount including the Loan Originator´s skin" }
+        remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
+        investedAmount: { type: string, description: "Remaining investor invested amount" }
+        lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
+        buyback: { type: string, description: "" }
+        currency: { $ref: '#/components/schemas/Currency'}
+        status: { $ref: '#/components/schemas/LoanStatus' }
+        totalTermInDays: { type: integer, description: "Loan’s total term in days" }
+        remainingTermInDays: { type: integer, description: "Loan’s total remaining term in days" }
+        interestRate: { type: string, description: "Annual interest rate percentage" }
+        country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
+        lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
+        finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
+        createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
+        limitCustomerTypes: { type: string, description: "" }
+        paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
+        allowedInvestmentSources: { type: array, examples: ["MANUAL","AUTOINVEST"]}
+
     LoanScheduleItem:
       type: object
       required: [date, principalAmount, interestAmount]
@@ -194,30 +220,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: object
-                    properties:
-                      uuid: { $ref: '#/components/schemas/LoanUuid'}
-                      loanPublicId: { type: string, description: "Unique ID of the loan in the LM system which is more human readable ID of the extension" }
-                      lenderLoanId: { type: string, description: "Unique Loan ID on the lender side" }
-                      scheduleType: { $ref: '#/components/schemas/ScheduleType' }
-                      loanAmount: { type: string, description: "Total Loan Amount in specified currency" }
-                      remainingPrincipalAmount: { type: string, description: "Remaining principal amount including the Loan Originator´s skin" }
-                      remainingSkinAmount: { type: string, description: "Remaining Loan Originator´s skin amount" }
-                      investedAmount: { type: string, description: "Remaining investor invested amount" }
-                      lenderSkinPercentage: { type: string, description: "Percentage of Loan Originator´s skin in the game. This percentage of loan amount will not be available for investment." }
-                      buyback: { type: string, description: "" }
-                      currency: { $ref: '#/components/schemas/Currency'}
-                      status: { $ref: '#/components/schemas/LoanStatus' }
-                      totalTermInDays: { type: integer, description: "Loan’s total term in days" }
-                      remainingTermInDays: { type: integer, description: "Loan’s total remaining term in days" }
-                      interestRate: { type: string, description: "Annual interest rate percentage" }
-                      country: { type: string, description: "Loan Originator country (3 digit ISO code)" }
-                      lenderIssueDate: { type: string, format: date, description: "Loan’s actual creation date on the lender side" }
-                      finalPaymentDate: { type: string, format: date, description: "Date of the loan’s final installment" }
-                      createdAt: { type: string, format: date, description: "Creation date of the loan in the LM system" }
-                      limitCustomerTypes: { type: string, description: "" }
-                      paymentSchedule: { type: array, items: { $ref: '#/components/schemas/PaymentScheduleItem' }}
+                  data: { $ref: '#/components/schemas/Loan'}
               example:
                 data:
                   uuid: "dcb87579-8d5e-412a-9f71-7c46c72ed589"
@@ -259,6 +262,7 @@ paths:
           description: Unprocessable Entity
           content:
             application/json:
+              schema: { $ref: '#/components/schemas/UnprocessableEntity'}
               example:
                 message: The lender loan id field is required. (and 8 more errors)
                 errors:
@@ -353,6 +357,7 @@ paths:
           description: Unprocessable Entity
           content:
             application/json:
+              schema: { $ref: '#/components/schemas/UnprocessableEntity'}
               example:
                 message: The loan uuid field is required. (and 1 more error)
                 errors:
@@ -408,6 +413,7 @@ paths:
           description: Unprocessable Entity
           content:
             application/json:
+              schema: { $ref: '#/components/schemas/UnprocessableEntity'}
               example:
                 message: The loan uuid field is required. (and 1 more error)
                 errors:
@@ -493,8 +499,7 @@ paths:
 
   /getLoan:
     get:
-      summary: View Loan Details
-      tags: [Loan Management]
+      summary: View details of the loan
       security:
         - bearerAuth: []
       parameters:
@@ -505,9 +510,13 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Loan'}
               example:
                 data:
                   uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -517,3 +526,13 @@ paths:
                     - dueDate: "2023-02-26"
                       totalPrincipalAmount: "1000"
                       paidPrincipalAmount: "500"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnprocessableEntity'}
+              example:
+                message: The loan uuid field is required.
+                errors:
+                  loanUuid:
+                  - The loan uuid field is required.
