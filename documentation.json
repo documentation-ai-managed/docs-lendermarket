@@ -17,13 +17,13 @@
     "tabs": [
       {
         "tab": "Introduction",
+        "icon": "lucide-sparkles",
         "pages": [
           {
             "title": "Getting Started",
             "path": "getting-started"
           }
-        ],
-        "icon": "lucide-sparkles"
+        ]
       },
       {
         "tab": "Resources",
