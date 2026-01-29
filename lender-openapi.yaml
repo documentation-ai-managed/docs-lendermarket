@@ -431,7 +431,7 @@ paths:
         - Earliest claims will always be paid first.  
         - Loan payments will be distributed by following order; `DELAYED_INTEREST`, `INTEREST`, `PRINCIPAL`.  
         - In the case of overpayment, the overpaid amount will go towards the next claim. In case there are no future claims only the owed part is taken from the payment and remainder of overpayment is given back in response.  
-        - Partial payments minimum amount is determined by the loans given currencies minor unit. In the case of EUR it would be 0.01.
+        - Partial payments minimum amount is determined by the loans given currencies minor unit. In the case of `EUR` it would be `0.01`.
       security:
         - bearerAuth: []
       requestBody:
