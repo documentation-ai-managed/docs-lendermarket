@@ -299,7 +299,7 @@ paths:
       summary: Extend Loan
       description: |
         Extend the maturity dates of an existing loan’s installments on Lendermarket side.  
-
+        \
         Loans can be only extended if at the point of createLoans the extensions have been allowed. 
         Trying to extend loan that cant be extended will give `422 Error - Maximum number allowed extensions reached`,
       security:
@@ -428,14 +428,10 @@ paths:
       summary: Create Payment
       description: |
         Create payment for a existing loan.  
-        \
-        Earliest claims will always be paid first.  
-        \
-        Loan payments will be distributed by following order; `DELAYED_INTEREST`, `INTEREST`, `PRINCIPAL`.  
-        \
-        In the case of overpayment, the overpaid amount will go towards the next claim. In case there are no future claims only the owed part is taken from the payment and remainder of overpayment is given back in response.  
-        \
-        Partial payments minimum amount is determined by the loans given currencies minor unit. In the case of EUR it would be 0.01.
+        - Earliest claims will always be paid first.  
+        - Loan payments will be distributed by following order; `DELAYED_INTEREST`, `INTEREST`, `PRINCIPAL`.  
+        - In the case of overpayment, the overpaid amount will go towards the next claim. In case there are no future claims only the owed part is taken from the payment and remainder of overpayment is given back in response.  
+        - Partial payments minimum amount is determined by the loans given currencies minor unit. In the case of EUR it would be 0.01.
       security:
         - bearerAuth: []
       requestBody:
