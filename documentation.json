@@ -16,7 +16,12 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "API Reference",
+        "tab": "Introduction",
+        "pages": [],
+        "icon": "lucide-sparkles"
+      },
+      {
+        "tab": "Resources",
         "icon": "code",
         "groups": [
           {
