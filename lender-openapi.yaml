@@ -141,8 +141,21 @@ components:
         companyRegistryCode: { type: string, description: "Company Registration Code" }
         representativeName: { type: string, description: "Company Representative Full Name" }
         representativePersonalCode: { type: string, description: "ID number of Company Representative" }
-        collateralValue: { type: string, description: "Collateral value for the loan - required for type `BUSINESS_WITH_COLLATERAL`" }
-        currency: { type: string, enum: [EUR], description: "Current validation restricted to `EUR` - required for type `BUSINESS_WITH_COLLATERAL`" }
+        collateralValue: { 
+          type: string, 
+          description: |
+            Collateral value for the loan
+
+            Required for type `BUSINESS_WITH_COLLATERAL` 
+        }
+        currency: { 
+          type: string, 
+          enum: [EUR], 
+          description: |
+            Current validation restricted to `EUR`
+            
+            Required for type `BUSINESS_WITH_COLLATERAL` 
+        }
 
     BuybackReason:
       type: string
