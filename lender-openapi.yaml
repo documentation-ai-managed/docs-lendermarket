@@ -199,7 +199,7 @@ paths:
                 clientType: { $ref: '#/components/schemas/ClientType' }
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
                 businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
-                businessClientWithCollateral: { $ref: '#/components/schemas/BusinessWithCollateral' }
+                businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
