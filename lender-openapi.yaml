@@ -135,24 +135,14 @@ components:
     BusinessClientBase:
       type: object
       required: [companyName, companyRegistryCode, representativeName, representativeCode]
-      description: "Required when `clientType` is `BUSINESS_WITH_COLLATERAL`"
+      description: "Required when `clientType` is `BUSINESS_WITH_COLLATERAL`, `BUSINESS_WITHOUT_COLLATERAL`"
       properties:
         companyName: { type: string, description: "Name of the borrower company" }
         companyRegistryCode: { type: string, description: "Company Registration Code" }
         representativeName: { type: string, description: "Company Representative Full Name" }
         representativePersonalCode: { type: string, description: "ID number of Company Representative" }
-
-    BusinessWithCollateral:
-      type: object
-      required: [companyName, companyRegistryCode, representativeName, representativeCode, collateralValue, currency]
-      description: "Required when `clientType` is `BUSINESS_WITHOUT_COLLATERAL`"
-      properties:
-        companyName: { type: string, description: "Name of the borrower company" }
-        companyRegistryCode: { type: string, description: "Company Registration Code" }
-        representativeName: { type: string, description: "Company Representative Full Name" }
-        representativePersonalCode: { type: string, description: "ID number of Company Representative" }
-        collateralValue: { type: string, description: "Collateral value for the loan" }
-        currency: { $ref: '#/components/schemas/Currency'}
+        collateralValue: { type: string, description: "Collateral value for the loan - required for type `BUSINESS_WITH_COLLATERAL`" }
+        currency: { type: string, enum: [EUR], description: "Current validation restricted to `EUR` - required for type `BUSINESS_WITH_COLLATERAL`" }
 
     BuybackReason:
       type: string
@@ -199,7 +189,6 @@ paths:
                 clientType: { $ref: '#/components/schemas/ClientType' }
                 consumerClient: { $ref: '#/components/schemas/ConsumerClient' }
                 businessClient: { $ref: '#/components/schemas/BusinessClientBase' }
-                businessClient: { $ref: '#/components/schemas/BusinessWithCollateral' }
             example:
               lenderLoanId: "ABC-12345"
               scheduleType: "FULL-BULLET"
