@@ -46,6 +46,16 @@
                 "pages": []
               }
             ]
+          },
+          {
+            "group": "Platform Statistics",
+            "pages": [
+              {
+                "title": "Introduction",
+                "path": "introduction"
+              }
+            ],
+            "icon": "arrow-up-az"
           }
         ]
       },
