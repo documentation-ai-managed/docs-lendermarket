@@ -1,1 +1,99 @@
-intro
+# Platform Statistics
+
+Lendermarket publishes aggregated platform statistics as static JSON files. The files are public, require no authentication, and are regenerated once per day. Use them to display Lendermarket platform figures on partner websites, in affiliate tools, or in market overviews.
+
+Two feeds are available:
+
+| Feed                               | Contents                                                              | Typical use                             |
+| ---------------------------------- | --------------------------------------------------------------------- | --------------------------------------- |
+| [Compact](/api/statistics/compact) | Six headline figures in a flat structure                              | Widgets, banners, quick summaries       |
+| [Full](/api/statistics/full)       | Headline KPIs plus monthly time series and portfolio health breakdown | Charts, market research, detailed pages |
+
+## File URLs
+
+Files are served from:
+
+```typescript
+https://lib.lendermarket.com/statistics/
+```
+
+The file name contains the generation date in `YYYYMMDD` format (UTC):
+
+```typescript
+https://lib.lendermarket.com/statistics/platform-statistics-{YYYYMMDD}.json
+https://lib.lendermarket.com/statistics/platform-statistics-compact-{YYYYMMDD}.json
+```
+
+For example, the files generated on 13.08.2026 are:
+
+```typescript
+https://lib.lendermarket.com/statistics/platform-statistics-20260813.json
+https://lib.lendermarket.com/statistics/platform-statistics-compact-20260813.json
+```
+
+## Requesting the current file
+
+Files are generated daily, shortly after midnight UTC. The exact generation time can vary, so a file for the current UTC date may not exist yet at the moment you request it. Handle this with a simple fallback:
+
+1. Request the file for the current UTC date.
+2. If the response is `404 Not Found`, request the file for the previous day.
+
+Files for previous days remain available, so the fallback always resolves within one step in normal operation.
+
+```bash
+DATE=$(date -u +%Y%m%d)
+URL="https://lib.lendermarket.com/statistics/platform-statistics-compact-${DATE}.json"
+
+if ! curl -sf "$URL" -o statistics.json; then
+  DATE=$(date -u -d "yesterday" +%Y%m%d)
+  curl -sf "https://lib.lendermarket.com/statistics/platform-statistics-compact-${DATE}.json" -o statistics.json
+fi
+```
+
+```python
+from datetime import datetime, timedelta, timezone
+import requests
+
+BASE = "https://lib.lendermarket.com/statistics/platform-statistics-compact-{}.json"
+
+date = datetime.now(timezone.utc)
+response = requests.get(BASE.format(date.strftime("%Y%m%d")))
+if response.status_code == 404:
+    date -= timedelta(days=1)
+    response = requests.get(BASE.format(date.strftime("%Y%m%d")))
+response.raise_for_status()
+
+statistics = response.json()
+```
+
+```javascript
+const base = "https://lib.lendermarket.com/statistics/platform-statistics-compact-";
+
+async function fetchStatistics() {
+  const format = (d) => d.toISOString().slice(0, 10).replaceAll("-", "");
+  const today = new Date();
+
+  let response = await fetch(`${base}${format(today)}.json`);
+  if (response.status === 404) {
+    today.setUTCDate(today.getUTCDate() - 1);
+    response = await fetch(`${base}${format(today)}.json`);
+  }
+  if (!response.ok) throw new Error(`Statistics fetch failed: ${response.status}`);
+
+  return response.json();
+}
+```
+
+## Data conventions
+
+- All monetary values are in EUR, as JSON numbers with at most two decimal places.
+- Percentages are JSON numbers, for example `13.46` means 13.46%.
+- `generated_at` is an ISO 8601 timestamp in UTC.
+- Time series dates use the `YYYY-MM` month format.
+- Figures are a snapshot at generation time. The current month in any time series is a month-to-date value and will keep changing until the month is over.
+
+## Usage guidelines
+
+- The data changes once per day. Fetch each file at most once per day and cache the result on your side rather than requesting it on every page view.
+- Fields may be added to the files over time. Build your integration so that unknown fields are ignored rather than treated as errors.
+

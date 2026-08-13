@@ -1,0 +1,156 @@
+# Full statistics
+
+The full feed contains headline KPIs, monthly time series going back to September 2018, and a portfolio health breakdown. Use it for charts and detailed statistics pages.
+
+```
+GET https://lib.lendermarket.com/statistics/platform-statistics-{YYYYMMDD}.json
+```
+
+No authentication is required. See [Platform Statistics](/api/statistics/introduction) for the date fallback pattern and general data conventions.
+
+### Response fields
+
+<ResponseField name="generated_at" field-type="string" required="true">
+  Timestamp when the file was generated, ISO 8601, UTC
+</ResponseField>
+
+<ResponseField name="headline_kpis" field-type="object" required="true">
+  <Expandable title="Object Properties" default-open="false">
+    <ResponseField name="total_invested_all_time" field-type="number" required="true">
+      Total amount invested through the platform since launch, in EUR
+    </ResponseField>
+
+    <ResponseField name="total_interest_paid_all_time" field-type="number" required="true">
+      Total interest paid to investors since launch, in EUR
+    </ResponseField>
+
+    <ResponseField name="interest_paid_ytd" field-type="number" required="true">
+      Interest paid to investors in the current calendar year, in EUR
+    </ResponseField>
+
+    <ResponseField name="active_portfolio" field-type="number" required="true">
+      Outstanding principal of the active loan portfolio, in EUR
+    </ResponseField>
+
+    <ResponseField name="registered_investors" field-type="integer" required="true">
+      Total number of registered investors
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="platform_overview" field-type="object" required="true">
+  Monthly time series. Each series is an object with a `description` string and a `series` array. Series entries are ordered chronologically, and the latest entry is a month-to-date value.
+
+  <Expandable title="Object Properties" default-open="false">
+    <ResponseField name="new_loans_listed" field-type="object" required="true">
+      Loans listed per month. Series entries contain `date` (`YYYY-MM`), `value` (amount listed in EUR) and `count` (number of loans listed).
+    </ResponseField>
+
+    <ResponseField name="cumulative_loans_listed" field-type="object" required="true">
+      Running total of loans listed since launch. Series entries contain `date`, `value` (cumulative amount in EUR) and `count` (cumulative number of loans).
+    </ResponseField>
+
+    <ResponseField name="cumulative_investment" field-type="object" required="true">
+      Running total of investments made since launch. Series entries contain `date` and `value` (cumulative amount in EUR).
+    </ResponseField>
+
+    <ResponseField name="monthly_investment" field-type="object" required="true">
+      Amount invested per month. Series entries contain `date` and `value` (amount in EUR).
+    </ResponseField>
+
+    <ResponseField name="active_portfolio_over_time" field-type="object" required="true">
+      Historical size of the active loan portfolio, in EUR. Series entries contain `date` and `value`. This series starts in April 2024.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="portfolio_health" field-type="object" required="true">
+  <Expandable title="Object Properties" default-open="false">
+    <ResponseField name="outstanding_principal" field-type="object" required="true">
+      Contains `total`, the outstanding principal of the active portfolio in EUR, and `by_status`, an array splitting it by payment status. Each `by_status` entry has a `label` and a `percentage` of the outstanding principal. Labels returned are `current`, `late_1_15_days`, `late_16_30_days`, `late_31_60_days` and `pending_payments`. Percentages add up to approximately 100, subject to rounding.
+    </ResponseField>
+
+    <ResponseField name="default_rate_pct" field-type="number" required="true">
+      Share of the outstanding portfolio in default, in per cent
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="investor_base" field-type="object" required="true">
+  <Expandable title="Object Properties" default-open="false">
+    <ResponseField name="registered_investors" field-type="integer" required="true">
+      Total number of registered investors
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example response
+
+Series arrays are shortened here for readability. In the real file each series contains one entry per month.
+
+```json
+{
+  "generated_at": "2026-08-13T00:02:04.532Z",
+  "headline_kpis": {
+    "total_invested_all_time": 675680106.95,
+    "total_interest_paid_all_time": 43810138.14,
+    "interest_paid_ytd": 5460270.92,
+    "active_portfolio": 61451827.21,
+    "registered_investors": 30400
+  },
+  "platform_overview": {
+    "new_loans_listed": {
+      "description": "Monthly new loans listed (amount and count)",
+      "series": [
+        { "date": "2018-09", "value": 27786.97, "count": 60 },
+        { "date": "2026-07", "value": 11577041.03, "count": 32698 },
+        { "date": "2026-08", "value": 4018740.94, "count": 8533 }
+      ]
+    },
+    "cumulative_loans_listed": {
+      "description": "Cumulative loans listed over time",
+      "series": [
+        { "date": "2018-09", "value": 27786.97, "count": 60 },
+        { "date": "2026-08", "value": 810711610.58, "count": 1681407 }
+      ]
+    },
+    "cumulative_investment": {
+      "description": "Cumulative investment over time",
+      "series": [
+        { "date": "2018-09", "value": 10921.34 },
+        { "date": "2026-08", "value": 675680106.95 }
+      ]
+    },
+    "monthly_investment": {
+      "description": "Monthly investment amounts",
+      "series": [
+        { "date": "2018-09", "value": 10921.34 },
+        { "date": "2026-08", "value": 4323192.22 }
+      ]
+    },
+    "active_portfolio_over_time": {
+      "description": "Active portfolio historical time series",
+      "series": [
+        { "date": "2024-04", "value": 419980.08 },
+        { "date": "2026-07", "value": 61434199.13 }
+      ]
+    }
+  },
+  "portfolio_health": {
+    "outstanding_principal": {
+      "total": 61451827.21,
+      "by_status": [
+        { "label": "current", "percentage": 89.93 },
+        { "label": "late_1_15_days", "percentage": 3.6 },
+        { "label": "late_16_30_days", "percentage": 3.73 },
+        { "label": "late_31_60_days", "percentage": 2.57 },
+        { "label": "pending_payments", "percentage": 0.15 }
+      ]
+    },
+    "default_rate_pct": 0
+  },
+  "investor_base": {
+    "registered_investors": 30400
+  }
+}
+```

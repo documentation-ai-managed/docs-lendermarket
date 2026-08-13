@@ -1,0 +1,53 @@
+# Compact statistics
+
+The compact feed contains six headline figures in a flat structure. It is the recommended feed for widgets and summary displays.
+
+```
+GET https://lib.lendermarket.com/statistics/platform-statistics-compact-{YYYYMMDD}.json
+```
+
+No authentication is required. See [Platform Statistics](/api/statistics/introduction) for the date fallback pattern and general data conventions.
+
+### Response fields
+
+<ResponseField name="generated_at" field-type="string" required="true">
+  Timestamp when the file was generated, ISO 8601, UTC
+</ResponseField>
+
+<ResponseField name="total_invested" field-type="number" required="true">
+  Total amount invested through the platform since launch, in EUR
+</ResponseField>
+
+<ResponseField name="earned_by_investors" field-type="number" required="true">
+  Total interest paid to investors since launch, in EUR
+</ResponseField>
+
+<ResponseField name="active_portfolio" field-type="number" required="true">
+  Outstanding principal of the active loan portfolio, in EUR
+</ResponseField>
+
+<ResponseField name="weighted_avg_interest_rate_pct" field-type="number" required="true">
+  Weighted average annual interest rate of the active loan portfolio, in per cent
+</ResponseField>
+
+<ResponseField name="registered_investors" field-type="integer" required="true">
+  Total number of registered investors
+</ResponseField>
+
+<ResponseField name="loans_available" field-type="integer" required="true">
+  Number of loans currently available for investment
+</ResponseField>
+
+### Example response
+
+```json
+{
+  "generated_at": "2026-08-13T00:02:04.532Z",
+  "total_invested": 675680106.95,
+  "earned_by_investors": 43810138.14,
+  "active_portfolio": 61451827.21,
+  "weighted_avg_interest_rate_pct": 13.46,
+  "registered_investors": 30400,
+  "loans_available": 4882
+}
+```
