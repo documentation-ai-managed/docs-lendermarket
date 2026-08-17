@@ -79,5 +79,13 @@
         ]
       }
     ]
+  },
+  "logo-dark": "https://blob-cdn.documentation.ai/org-d716d074-fc67-4ece-af61-62c25ee01797/doc-c5525066-5daf-4091-86b3-6d78240a2425/1786952503598-2zq6s8pkfmo-lendermarket-logo-white.svg?rasterize-bypass=true",
+  "logo-light": "https://blob-cdn.documentation.ai/org-d716d074-fc67-4ece-af61-62c25ee01797/doc-c5525066-5daf-4091-86b3-6d78240a2425/1786952514050-ynem7mw2qf9-lendermarket-logo-black.svg?rasterize-bypass=true",
+  "seo": {
+    "robots:index": false,
+    "robots:follow": false,
+    "llms-txt:enabled": false,
+    "sitemap:enabled": false
   }
 }
