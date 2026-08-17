@@ -46,24 +46,6 @@
                 "pages": []
               }
             ]
-          },
-          {
-            "group": "Platform Statistics",
-            "pages": [
-              {
-                "title": "Introduction",
-                "path": "introduction"
-              },
-              {
-                "title": "Compact Statistics",
-                "path": "compact-statistics"
-              },
-              {
-                "title": "Full Statistics",
-                "path": "full-statistics"
-              }
-            ],
-            "icon": "arrow-up-az"
           }
         ]
       },
