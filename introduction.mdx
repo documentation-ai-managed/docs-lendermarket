@@ -1,7 +1,6 @@
 # Platform Statistics
 
 Lendermarket publishes aggregated platform statistics as static JSON files. The files are public, require no authentication, and are regenerated once per day. Use them to display Lendermarket platform figures on partner websites, in affiliate tools, or in market overviews.
-
 Two feeds are available:
 
 | Feed                           | Contents                                                              | Typical use                             |
@@ -33,17 +32,16 @@ https://lib.lendermarket.com/statistics/platform-statistics-compact-20260813.jso
 
 ## Requesting the current file
 
-Files are generated daily, shortly after midnight UTC. The exact generation time can vary, so a file for the current UTC date may not exist yet at the moment you request it. Handle this with a simple fallback:
+Files are generated daily, shortly after midnight UTC. The exact generation time can vary, so a file for the current UTC date may not exist yet at the moment you request it.
+Note that a request for a file that does not exist returns `403 Forbidden`, not `404 Not Found`. Treat `403` as "no file for this date". Handle it with a simple fallback:
 
 1. Request the file for the current UTC date.
-2. If the response is `404 Not Found`, request the file for the previous day.
-
-Files for previous days remain available, so the fallback always resolves within one step in normal operation.
+2. If the response is `403 Forbidden`, request the file for the previous day.
+   Files for previous days remain available, so the fallback always resolves within one step in normal operation.
 
 ```bash
 DATE=$(date -u +%Y%m%d)
 URL="https://lib.lendermarket.com/statistics/platform-statistics-compact-${DATE}.json"
-
 if ! curl -sf "$URL" -o statistics.json; then
   DATE=$(date -u -d "yesterday" +%Y%m%d)
   curl -sf "https://lib.lendermarket.com/statistics/platform-statistics-compact-${DATE}.json" -o statistics.json
@@ -53,33 +51,27 @@ fi
 ```python
 from datetime import datetime, timedelta, timezone
 import requests
-
 BASE = "https://lib.lendermarket.com/statistics/platform-statistics-compact-{}.json"
-
 date = datetime.now(timezone.utc)
 response = requests.get(BASE.format(date.strftime("%Y%m%d")))
-if response.status_code == 404:
+if response.status_code == 403:
     date -= timedelta(days=1)
     response = requests.get(BASE.format(date.strftime("%Y%m%d")))
 response.raise_for_status()
-
 statistics = response.json()
 ```
 
 ```javascript
 const base = "https://lib.lendermarket.com/statistics/platform-statistics-compact-";
-
 async function fetchStatistics() {
   const format = (d) => d.toISOString().slice(0, 10).replaceAll("-", "");
   const today = new Date();
-
   let response = await fetch(`${base}${format(today)}.json`);
-  if (response.status === 404) {
+  if (response.status === 403) {
     today.setUTCDate(today.getUTCDate() - 1);
     response = await fetch(`${base}${format(today)}.json`);
   }
   if (!response.ok) throw new Error(`Statistics fetch failed: ${response.status}`);
-
   return response.json();
 }
 ```
