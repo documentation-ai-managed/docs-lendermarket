@@ -12,7 +12,7 @@ Interest is calculated at 19 decimal places and only reduced to cents at the mom
 
 The instalment interest is:
 
-```typescript
+```bash
 InstalmentInterest[n] = 
     TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
 ```
@@ -51,7 +51,8 @@ DailyRate      = 0.0002777777777777777
 For each instalment n:
 
 ```typescript
-PeriodInterest[n] = TRUNC( OutstandingPrincipal[n] × DailyRate × Days[n], 19 )
+PeriodInterest[n] = 
+    TRUNC( OutstandingPrincipal[n] × DailyRate × Days[n], 19 )
 ```
 
 ### Step 3. Cumulative interest
@@ -64,7 +65,8 @@ Cumulative[0] = 0
 ### Step 4. Instalment interest
 
 ```typescript
-InstalmentInterest[n] = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+InstalmentInterest[n] = 
+    TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
 ```
 
 `TRUNC(Cumulative[n−1], 2)` equals the total interest already paid in instalments 1 to n−1 (the "Interest already paid" column in the worked example below), so the formula can also be read as: total interest earned to date, minus interest already paid, truncated to cents.
