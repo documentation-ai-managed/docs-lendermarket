@@ -1,0 +1,187 @@
+---
+title: Interest calculation for repayment schedules
+description: >-
+  This page describes how Lendermarket calculates the interest amount of each
+  instalment in a loan schedule, and how the interestAmount values you submit
+  are validated. Schedules whose interest amounts differ from this calculation
+  are rejected with a validation error.
+---
+## Summary
+
+Interest is calculated at 19 decimal places and only reduced to cents at the moment an instalment is paid. Nothing is rounded. Every reduction in precision is a truncation (digits are cut off, never rounded up), and the part that is cut off is carried forward into the next instalment.
+
+The instalment interest is:
+
+```typescript
+InstalmentInterest[n] = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+```
+
+where `Cumulative[n]` is the sum of the precise period interest of instalments 1 to n, held at 19 decimal places, and `Cumulative[0] = 0`.
+
+## Definitions
+
+| Term                  | Meaning                                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `TRUNC(x, d)`         | Cut `x` off after `d` decimal places. `TRUNC(5.3999, 2) = 5.39`. `TRUNC(4.9904, 2) = 4.99`. No rounding.                            |
+| Annual rate           | The loan interest rate as a percentage, for example `10` for 10 %.                                                                  |
+| Day count             | ACT/360. Actual calendar days in the period, divided by 360.                                                                        |
+| Period                | The days from the previous due date (or the interest start date for the first instalment) up to and including the current due date. |
+| Outstanding principal | The principal outstanding at the start of the period, before the period's principal repayment.                                      |
+
+## Calculation steps
+
+Perform the steps in this order. The order matters, because truncating an intermediate value changes the result (see [Why the order matters](#why-the-order-matters)).
+
+### Step 1. Daily rate
+
+```typescript
+DailyRate = TRUNC( AnnualRate / 100 / 360, 19 )
+```
+
+Example for 10 %:
+
+```typescript
+10 / 100 / 360 = 0.000277777777777777777…
+DailyRate      = 0.0002777777777777777
+```
+
+### Step 2. Period interest
+
+For each instalment n:
+
+```typescript
+PeriodInterest[n] = TRUNC( OutstandingPrincipal[n] × DailyRate × Days[n], 19 )
+```
+
+### Step 3. Cumulative interest
+
+```typescript
+Cumulative[n] = TRUNC( Cumulative[n−1] + PeriodInterest[n], 19 )
+Cumulative[0] = 0
+```
+
+### Step 4. Instalment interest
+
+```typescript
+InstalmentInterest[n] = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+```
+
+`TRUNC(Cumulative[n−1], 2)` equals the total interest already paid in instalments 1 to n−1 (the "Interest already paid" column in the worked example below), so the formula can also be read as: total interest earned to date, minus interest already paid, truncated to cents.
+
+## Worked example
+
+Loan parameters:
+
+| Parameter           | Value                          |
+| ------------------- | ------------------------------ |
+| Principal           | 648.00 EUR                     |
+| Annual rate         | 10 %                           |
+| Daily rate          | 0.0002777777777777777          |
+| Interest start date | 08.09.2026                     |
+| Day count           | ACT/360                        |
+| Schedule type       | Annuity, 9 monthly instalments |
+
+Full schedule:
+
+| # | Due date   | Days | Outstanding principal | Principal repayment | Period interest (19 dp) | Cumulative interest (19 dp) | Interest already paid | Instalment interest |
+| - | ---------- | ---- | --------------------- | ------------------- | ----------------------- | --------------------------- | --------------------- | ------------------- |
+| 1 | 08.10.2026 | 30   | 648.00                | 69.63               | 5.3999999999999984880   | 5.3999999999999984880       | 0.00                  | 5.39                |
+| 2 | 08.11.2026 | 31   | 578.37                | 70.07               | 4.9804083333333319388   | 10.3804083333333304268      | 5.39                  | 4.99                |
+| 3 | 08.12.2026 | 30   | 508.30                | 70.83               | 4.2358333333333321473   | 14.6162416666666625741      | 10.38                 | 4.23                |
+| 4 | 08.01.2027 | 31   | 437.47                | 71.31               | 3.7671027777777767229   | 18.3833444444444392970      | 14.61                 | 3.77                |
+| 5 | 08.02.2027 | 31   | 366.16                | 71.93               | 3.1530444444444435615   | 21.5363888888888828585      | 18.38                 | 3.15                |
+| 6 | 08.03.2027 | 28   | 294.23                | 72.79               | 2.2884555555555549147   | 23.8248444444444377732      | 21.53                 | 2.29                |
+| 7 | 08.04.2027 | 31   | 221.44                | 73.17               | 1.9068444444444439105   | 25.7316888888888816837      | 23.82                 | 1.91                |
+| 8 | 08.05.2027 | 30   | 148.27                | 73.83               | 1.2355833333333329873   | 26.9672722222222146710      | 25.73                 | 1.23                |
+| 9 | 08.06.2027 | 31   | 74.44                 | 74.44               | 0.6410111111111109316   | 27.6082833333333256026      | 26.96                 | 0.64                |
+
+Total instalment interest: 27.60 EUR.
+
+### Instalment 1 in detail
+
+```typescript
+PeriodInterest[1]     = TRUNC( 648.00 × 0.0002777777777777777 × 30, 19 )
+                      = 5.3999999999999984880
+
+Cumulative[1]         = 5.3999999999999984880
+
+InstalmentInterest[1] = TRUNC( 5.3999999999999984880 − TRUNC( 0, 2 ), 2 )
+                      = TRUNC( 5.3999999999999984880, 2 )
+                      = 5.39
+```
+
+The unpaid remainder of 0.0099999999999984880 stays in the cumulative total.
+
+### Instalment 2 in detail
+
+```typescript
+PeriodInterest[2]     = TRUNC( 578.37 × 0.0002777777777777777 × 31, 19 )
+                      = 4.9804083333333319388
+
+Cumulative[2]         = TRUNC( 5.3999999999999984880 + 4.9804083333333319388, 19 )
+                      = 10.3804083333333304268
+
+InstalmentInterest[2] = TRUNC( 10.3804083333333304268 − TRUNC( 5.3999999999999984880, 2 ), 2 )
+                      = TRUNC( 10.3804083333333304268 − 5.39, 2 )
+                      = TRUNC( 4.9904083333333304268, 2 )
+                      = 4.99
+```
+
+The remainder carried from instalment 1 is paid here. The interest is 4.99, not 4.98.
+
+### Instalment 3 in detail
+
+```typescript
+PeriodInterest[3]     = TRUNC( 508.30 × 0.0002777777777777777 × 30, 19 )
+                      = 4.2358333333333321473
+
+Cumulative[3]         = 14.6162416666666625741
+
+InstalmentInterest[3] = TRUNC( 14.6162416666666625741 − TRUNC( 10.3804083333333304268, 2 ), 2 )
+                      = TRUNC( 14.6162416666666625741 − 10.38, 2 )
+                      = TRUNC( 4.2362416666666625741, 2 )
+                      = 4.23
+```
+
+## Why the order matters
+
+A common alternative is to compute each period in one step with exact arithmetic:
+
+```typescript
+648 × 10 / 100 × 30 / 360 = 5.40
+```
+
+This gives 5.40 for instalment 1 and 4.98 for instalment 2. Both values are rejected.
+
+The difference comes from the daily rate. 10 % over 360 days is a repeating decimal (0.000277…). Held at 19 decimal places it is slightly smaller than the exact value, so 648 × 30 × DailyRate lands just below 5.40 and truncates to 5.39. The missing cent is not lost: it stays in the cumulative total and is paid with instalment 2, which becomes 4.99. From instalment 3 onwards both approaches agree, and the total interest over the loan is the same (27.60 EUR).
+
+To match Lendermarket's validation, calculate the daily rate first, truncate it to 19 decimal places, and only then multiply by principal and days.
+
+## Validation errors
+
+If a submitted `interestAmount` differs from the calculated value, the schedule is rejected. The error names the instalment date, the submitted value, the required value and the difference:
+
+```json
+{
+  "message": "Invalid interest on 2026-10-08: 5.40 vs required 5.39 (difference -0.01) (and 1 more error)",
+  "errors": {
+    "schedule.0.interestAmount": [
+      "Invalid interest on 2026-10-08: 5.40 vs required 5.39 (difference -0.01)"
+    ],
+    "schedule.1.interestAmount": [
+      "Invalid interest on 2026-11-08: 4.98 vs required 4.99 (difference 0.01)"
+    ]
+  }
+}
+```
+
+A pair of errors with differences of −0.01 and +0.01 on consecutive instalments almost always means the daily rate was not truncated before multiplying, or that a value was rounded instead of truncated.
+
+## Implementation notes
+
+- Use a decimal type with at least 19 decimal places for all intermediate values. Binary floating point (`float`, `double`) will not reproduce these results.
+- Truncate. Never round, at any step.
+- Keep `Cumulative[n]` at full precision between instalments. Only the value subtracted, `TRUNC(Cumulative[n−1], 2)`, is in cents.
+- Because `TRUNC(Cumulative[n−1], 2)` is always a whole number of cents, the formula is equivalent to `TRUNC(Cumulative[n], 2) − TRUNC(Cumulative[n−1], 2)`. Either form gives the same result.
+- The sum of all instalment interest equals `TRUNC(Cumulative[last], 2)`.
+

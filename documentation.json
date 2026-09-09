@@ -41,6 +41,10 @@
                 "path": "api/lender/authorizaiton"
               },
               {
+                "title": "Interest calculation guidelines",
+                "path": "interest-calculation-guidelines"
+              },
+              {
                 "group": "Endpoints",
                 "openapi": "lender-openapi.yaml",
                 "pages": []
