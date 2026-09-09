@@ -42,7 +42,7 @@
               },
               {
                 "title": "Interest calculation guidelines",
-                "path": "interest-calculation-guidelines"
+                "path": "api/lender/interest-calculation-guidelines"
               },
               {
                 "group": "Endpoints",
