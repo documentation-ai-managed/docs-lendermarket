@@ -12,9 +12,9 @@ Interest is calculated at 19 decimal places and only reduced to cents at the mom
 
 The instalment interest is:
 
-```bash
-InstalmentInterest[n] = 
-    TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+```typescript
+InstalmentInterest[n] 
+    = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
 ```
 
 where `Cumulative[n]` is the sum of the precise period interest of instalments 1 to n, held at 19 decimal places, and `Cumulative[0] = 0`.
@@ -51,8 +51,8 @@ DailyRate      = 0.0002777777777777777
 For each instalment n:
 
 ```typescript
-PeriodInterest[n] = 
-    TRUNC( OutstandingPrincipal[n] × DailyRate × Days[n], 19 )
+PeriodInterest[n] 
+    = TRUNC( OutstandingPrincipal[n] × DailyRate × Days[n], 19 )
 ```
 
 ### Step 3. Cumulative interest
@@ -65,8 +65,8 @@ Cumulative[0] = 0
 ### Step 4. Instalment interest
 
 ```typescript
-InstalmentInterest[n] = 
-    TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+InstalmentInterest[n] 
+    = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
 ```
 
 `TRUNC(Cumulative[n−1], 2)` equals the total interest already paid in instalments 1 to n−1 (the "Interest already paid" column in the worked example below), so the formula can also be read as: total interest earned to date, minus interest already paid, truncated to cents.
@@ -103,14 +103,17 @@ Total instalment interest: 27.60 EUR.
 ### Instalment 1 in detail
 
 ```typescript
-PeriodInterest[1]     = TRUNC( 648.00 × 0.0002777777777777777 × 30, 19 )
-                      = 5.3999999999999984880
+PeriodInterest[1]     
+    = TRUNC( 648.00 × 0.0002777777777777777 × 30, 19 )
+    = 5.3999999999999984880
 
-Cumulative[1]         = 5.3999999999999984880
+Cumulative[1]         
+    = 5.3999999999999984880
 
-InstalmentInterest[1] = TRUNC( 5.3999999999999984880 − TRUNC( 0, 2 ), 2 )
-                      = TRUNC( 5.3999999999999984880, 2 )
-                      = 5.39
+InstalmentInterest[1] 
+    = TRUNC( 5.3999999999999984880 − TRUNC( 0, 2 ), 2 )
+    = TRUNC( 5.3999999999999984880, 2 )
+    = 5.39
 ```
 
 The unpaid remainder of 0.0099999999999984880 stays in the cumulative total.
@@ -118,16 +121,19 @@ The unpaid remainder of 0.0099999999999984880 stays in the cumulative total.
 ### Instalment 2 in detail
 
 ```typescript
-PeriodInterest[2]     = TRUNC( 578.37 × 0.0002777777777777777 × 31, 19 )
-                      = 4.9804083333333319388
+PeriodInterest[2]     
+    = TRUNC( 578.37 × 0.0002777777777777777 × 31, 19 )
+    = 4.9804083333333319388
 
-Cumulative[2]         = TRUNC( 5.3999999999999984880 + 4.9804083333333319388, 19 )
-                      = 10.3804083333333304268
+Cumulative[2]         
+    = TRUNC( 5.3999999999999984880 + 4.9804083333333319388, 19 )
+    = 10.3804083333333304268
 
-InstalmentInterest[2] = TRUNC( 10.3804083333333304268 − TRUNC( 5.3999999999999984880, 2 ), 2 )
-                      = TRUNC( 10.3804083333333304268 − 5.39, 2 )
-                      = TRUNC( 4.9904083333333304268, 2 )
-                      = 4.99
+InstalmentInterest[2] 
+    = TRUNC( 10.3804083333333304268 − TRUNC( 5.3999999999999984880, 2 ), 2 )
+    = TRUNC( 10.3804083333333304268 − 5.39, 2 )
+    = TRUNC( 4.9904083333333304268, 2 )
+    = 4.99
 ```
 
 The remainder carried from instalment 1 is paid here. The interest is 4.99, not 4.98.
@@ -135,15 +141,18 @@ The remainder carried from instalment 1 is paid here. The interest is 4.99, not 
 ### Instalment 3 in detail
 
 ```typescript
-PeriodInterest[3]     = TRUNC( 508.30 × 0.0002777777777777777 × 30, 19 )
-                      = 4.2358333333333321473
+PeriodInterest[3]
+    = TRUNC( 508.30 × 0.0002777777777777777 × 30, 19 )
+    = 4.2358333333333321473
 
-Cumulative[3]         = 14.6162416666666625741
+Cumulative[3]
+    = 14.6162416666666625741
 
-InstalmentInterest[3] = TRUNC( 14.6162416666666625741 − TRUNC( 10.3804083333333304268, 2 ), 2 )
-                      = TRUNC( 14.6162416666666625741 − 10.38, 2 )
-                      = TRUNC( 4.2362416666666625741, 2 )
-                      = 4.23
+InstalmentInterest[3] 
+    = TRUNC( 14.6162416666666625741 − TRUNC( 10.3804083333333304268, 2 ), 2 )
+    = TRUNC( 14.6162416666666625741 − 10.38, 2 )
+    = TRUNC( 4.2362416666666625741, 2 )
+    = 4.23
 ```
 
 ## Why the order matters
