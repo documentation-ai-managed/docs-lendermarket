@@ -13,7 +13,8 @@ Interest is calculated at 19 decimal places and only reduced to cents at the mom
 The instalment interest is:
 
 ```typescript
-InstalmentInterest[n] = TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
+InstalmentInterest[n] = 
+    TRUNC( Cumulative[n] − TRUNC( Cumulative[n−1], 2 ), 2 )
 ```
 
 where `Cumulative[n]` is the sum of the precise period interest of instalments 1 to n, held at 19 decimal places, and `Cumulative[0] = 0`.
