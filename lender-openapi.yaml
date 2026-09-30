@@ -46,6 +46,12 @@ components:
         - CONSUMER
         - BUSINESS_WITH_COLLATERAL
         - BUSINESS_WITHOUT_COLLATERAL
+        - NONE
+      description: |
+        Type of the borrower.
+        - `CONSUMER`: `consumerClient` is required.
+        - `BUSINESS_WITH_COLLATERAL`, `BUSINESS_WITHOUT_COLLATERAL`: `businessClient` is required.
+        - `NONE`: no client data is provided. `consumerClient` and `businessClient` must not be sent.
 
     LoanStatus:
       type: string
