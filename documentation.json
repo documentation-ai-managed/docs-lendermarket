@@ -16,16 +16,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Introduction",
-        "icon": "lucide-sparkles",
-        "pages": [
-          {
-            "title": "Getting Started",
-            "path": "getting-started"
-          }
-        ]
-      },
-      {
         "tab": "Resources",
         "icon": "code",
         "groups": [

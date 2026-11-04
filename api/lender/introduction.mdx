@@ -6,9 +6,7 @@ The **Lendermarket Loan Originator API** is a RESTful service designed to allow 
 ### Core Capabilities
 
 - **Loan Lifecycle Management:** Seamlessly create new loans for various client types (Consumer or Business) and manage maturity dates via the extension endpoint.
-
 - **Transaction Processing:** Initiate buyback requests and report loan payments. Payments are automatically distributed according to a predefined priority: `DELAYED_INTEREST`, `INTEREST`, and then `PRINCIPAL`.
-
 - **Data Retrieval:** Access detailed information on any loan, including remaining principal, invested amounts, and the full payment schedule, using its unique UUID.
 
 ### Security and Protocol
@@ -20,6 +18,5 @@ To ensure data integrity and security, all requests must be authorized using **B
 Lendermarket provides two distinct environments for integration and live operations:
 
 - **TEST (Staging):** `https://api.lendermarket.dev/claims/v1/lender/`
-
 - **PROD (Production):** `https://api.lendermarket.com/claims/v1/lender/`
 
