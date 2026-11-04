@@ -39,7 +39,7 @@
                   },
                   {
                     "title": "Repayments and payment allocation",
-                    "path": "repayments-and-payment-allocation"
+                    "path": "api/lender/repayments-and-payment-allocation"
                   }
                 ]
               },
