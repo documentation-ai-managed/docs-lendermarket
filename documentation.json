@@ -41,8 +41,7 @@
                     "title": "Interest calculation guidelines",
                     "path": "api/lender/interest-calculation-guidelines"
                   }
-                ],
-                "icon": "fa-solid:euro-sign"
+                ]
               },
               {
                 "group": "Endpoints",
