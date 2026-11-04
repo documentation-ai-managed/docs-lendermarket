@@ -1,5 +1,5 @@
 ---
-title: Repayments and payment allocation
+title: Payment allocation
 description: >-
   Every payment you report with createLoanPayment is allocated by the platform.
   You send the total amount received. The platform decides how much of it is
@@ -55,43 +55,9 @@ Principal is settled pro rata across the investments in the installment and your
 
 A payment larger than the installments due on the payment date continues into the following installments. Interest of a future installment is only charged up to the payment date, and the rest of the amount reduces the principal of that installment early (see the early repayment examples below). Any amount left after all outstanding claims of the loan are settled is recorded as an overpayment. It is not allocated to future installments and is not returned automatically. Contact your Lendermarket account manager to reconcile an overpayment.
 
-## How interest is calculated
+## Interest and delayed interest
 
-Interest is simple interest on the outstanding principal, calculated per installment period.
-
-| Parameter  | Value                                                                                                                                                                           |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rate       | The loan `interestRate`, converted to a daily rate as `interestRate / 100 / 360`                                                                                                |
-| Year basis | 360 days                                                                                                                                                                        |
-| Day count  | Calendar days between the previous due date and the installment due date. For the first installment, from the date the loan was created on the platform                         |
-| Rounding   | Truncated (not rounded) to the currency precision. Truncation is applied to the cumulative interest of the loan so that cents lost on one installment are carried into the next |
-
-The platform calculates the interest of every installment from the `schedule` you send in `createLoan` and rejects a schedule whose interest amounts do not match. Use the same method on your side.
-
-Example: a loan of EUR 900.00 at 10.80 % with three installments of EUR 300.00, 30 days apart.
-
-| Installment | Outstanding principal | Days | Interest                    |
-| ----------- | --------------------- | ---- | --------------------------- |
-| 1           | 900.00                | 30   | 900.00 × 0.0003 × 30 = 8.10 |
-| 2           | 600.00                | 30   | 600.00 × 0.0003 × 30 = 5.40 |
-| 3           | 300.00                | 30   | 300.00 × 0.0003 × 30 = 2.70 |
-
-The daily rate in this example is 10.80 / 100 / 360 = 0.0003.
-
-## How delayed interest is calculated
-
-Delayed interest starts on the day after an installment's due date and runs until the overdue principal of that installment is paid. It uses the same daily rate as the loan.
-
-| Parameter | Value                                                                                                                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Base      | The overdue principal of the installment that is held by investors. Your own retained share and any part of the installment that was not funded by investors do not accrue delayed interest |
-| Rate      | The loan daily rate (`interestRate / 100 / 360`)                                                                                                                                            |
-| Day count | Calendar days from the due date to the payment date, or to today for an installment that is still unpaid                                                                                    |
-| Rounding  | Truncated to the currency precision per investment, then summed for the loan                                                                                                                |
-
-Delayed interest is recalculated once a day for every overdue loan and again at the moment you report a payment, so the amount you see in `getLoan` and the amount allocated by `createLoanPayment` are both current as of the payment date.
-
-If a payment covers only part of the overdue principal, the remaining part keeps accruing delayed interest until it is paid.
+Scheduled interest is calculated as described on the Interest calculation for repayment schedules page. Delayed interest is a separate claim on principal paid after its due date, calculated as described on the Delayed interest page. Both are recalculated at the moment you report a payment, so the amounts allocated by `createLoanPayment` are current as of the payment date.
 
 ## Where to see the current amounts
 
@@ -108,7 +74,7 @@ Before sending a payment, read `getLoan` and add up the outstanding amounts of e
 
 ## Use cases
 
-All examples use the EUR 900.00 loan at 10.80 % from above, created on the platform on 2027-01-15, with installments due on 2027-02-14, 2027-03-16 and 2027-04-15. Investors hold 90 % of the loan (EUR 810.00) and you retain 10 %. Delayed interest amounts assume a single investment of EUR 810.00. With several investments the per-investment truncation can make the loan total a few cents lower.
+All examples use a regular loan of EUR 900.00 at 10.80 %, created on the platform on 2027-01-15, with three installments of EUR 300.00 principal due on 2027-02-14, 2027-03-16 and 2027-04-15. The daily rate is 0.0003 and the scheduled interest is 8.10, 5.40 and 2.70, calculated as on the Interest calculation for repayment schedules page. Investors hold 90 % of the loan (EUR 810.00) and you retain 10 %. Delayed interest amounts assume a single investment of EUR 810.00. With several investments the per-investment truncation can make the loan total a few cents lower.
 
 ### On-time payment
 
@@ -134,7 +100,7 @@ Response: `principalAmount` 300.00, `interestAmount` 8.10, `delayedInterestAmoun
 
 Installment 1 is not paid on 2027-02-14. You report EUR 308.10 on 2027-02-26, 12 days late.
 
-Before the payment is allocated the platform calculates delayed interest on the overdue investor-held principal: 270.00 × 0.0003 × 12 days = 0.972, truncated to EUR 0.97.
+Before the payment is allocated the platform calculates delayed interest on the overdue investor-held principal, EUR 0.97 in this case (see the Delayed interest page for the calculation).
 
 | Step | Claim            | Outstanding | Allocated | Remaining payment |
 | ---- | ---------------- | ----------- | --------- | ----------------- |
@@ -206,26 +172,3 @@ Installment 1 is settled as in the on-time example (8.10 interest, 300.00 princi
 ### Overpayment
 
 An overpayment only arises when the payment exceeds everything outstanding on the loan. Installments 1 and 2 are paid. Installment 3 (300.00 principal, 2.70 interest) is due on 2027-04-15 and you report EUR 310.00 on that day. The platform settles 2.70 interest and 300.00 principal, moves the loan to `FINISHED`, and records EUR 7.30 as an overpayment. The response shows `principalAmount` 300.00 and `interestAmount` 2.70 only. Contact your Lendermarket account manager to reconcile the difference.
-
-## Errors
-
-| HTTP | Field           | Message                    | Cause                                                                                     |
-| ---- | --------------- | -------------------------- | ----------------------------------------------------------------------------------------- |
-| 422  | `loanUuid`      | `Invalid loan uuid`        | Loan does not exist, does not belong to you, or `currency` differs from the loan currency |
-| 422  | `loanUuid`      | `Provided loan not active` | Loan is not in status `ACTIVE`                                                            |
-| 422  | `paymentAmount` | validation message         | Amount missing, zero, negative, or with too many decimals                                 |
-| 422  | `currency`      | validation message         | Currency missing or not supported                                                         |
-
-## Summary
-
-| Topic            | Rule                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------- |
-| What you send    | The total amount received. The platform allocates it                                      |
-| Payment date     | Date of the API call (UTC). No backdating                                                 |
-| Order            | Oldest installment first. Within an installment: delayed interest, interest, principal    |
-| Interest         | Simple interest, 360-day year, truncated to cents on the cumulative amount                |
-| Delayed interest | Loan daily rate on overdue investor-held principal, from the due date to the payment date |
-| Early payment    | Interest recalculated to the payment date. Early principal reduces the remaining schedule |
-| Partial payment  | Remainder of the installment stays open and, after the due date, accrues delayed interest |
-| Overpayment      | Recorded, not allocated, not returned automatically                                       |
-
