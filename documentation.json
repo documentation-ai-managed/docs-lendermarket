@@ -1,6 +1,6 @@
 {
   "name": "Lendermarket",
-  "initialRoute": "getting-started",
+  "initialRoute": "api/lender/introduction",
   "colors": {
     "light": {
       "brand": "#8551F7",
