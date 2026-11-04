@@ -38,8 +38,8 @@
                     "path": "api/lender/interest-calculation-guidelines"
                   },
                   {
-                    "title": "Repayments and payment allocation",
-                    "path": "api/lender/repayments-and-payment-allocation"
+                    "title": "Payment allocation",
+                    "path": "api/lender/payment-allocation"
                   }
                 ]
               },
