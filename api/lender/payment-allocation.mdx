@@ -1,13 +1,12 @@
 ---
 title: Payment allocation
 description: >-
-  Every payment you report with createLoanPayment is allocated by the platform.
-  You send the total amount received. The platform decides how much of it is
-  delayed interest, interest and principal, records the result on the loan and
-  on every investment in the loan, and returns the split to you. This page
-  explains the allocation rules, how interest and delayed interest are
-  calculated, and what happens when a payment is on time, late, early, partial
-  or larger than the amount due.
+  Every payment you report with `createLoanPayment` is allocated by the
+  platform. You send the total amount received. The platform decides how much of
+  it is delayed interest, interest and principal, records the result on the loan
+  and on every investment in the loan, and returns the split to you. This page
+  explains the allocation rules and what happens when a payment is on time,
+  late, early, partial or larger than the amount due.
 ---
 ## What you send and what you get back
 
@@ -53,28 +52,30 @@ The amount moves to the next step only when the current claim is fully settled, 
 
 Principal is settled pro rata across the investments in the installment and your own retained share of the loan (`lenderSkinPercentage`). The response reports loan-level amounts. The per-investment split is handled by the platform and is not returned.
 
-A payment larger than the installments due on the payment date continues into the following installments. Interest of a future installment is only charged up to the payment date, and the rest of the amount reduces the principal of that installment early (see the early repayment examples below). Any amount left after all outstanding claims of the loan are settled is recorded as an overpayment. It is not allocated to future installments and is not returned automatically. Contact your Lendermarket account manager to reconcile an overpayment.
+A payment can also reach installments that are not yet due. When the platform gets to an installment whose due date is after the payment date, it treats the amount as an early repayment of that installment: the interest accrued on it up to the payment date is settled first, and whatever is left reduces its principal. The due date of the installment does not change. See the early repayment examples below.
+
+Any amount left after every claim of the loan is settled is recorded as an overpayment. This is informational only. Nothing is paid out to investors from it, and it is not applied anywhere else.
 
 ## Interest and delayed interest
 
-Scheduled interest is calculated as described on the Interest calculation for repayment schedules page. Delayed interest is a separate claim on principal paid after its due date, calculated as described on the Delayed interest page. Both are recalculated at the moment you report a payment, so the amounts allocated by `createLoanPayment` are current as of the payment date.
+Scheduled interest is calculated as described on the Interest calculation for repayment schedules page. Delayed interest is a separate claim on principal paid after its due date, calculated as described on the Delayed interest page.
 
 ## Where to see the current amounts
 
 `GET getLoan` returns the schedule with the current state of every installment.
 
-| Field                                                                                         | Meaning                                                                      |
-| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `totalPrincipalAmount`, `totalInterestAmount`, `totalDelayedInterestAmount`                   | Amounts due for the installment                                              |
-| `paidPrincipalAmount`, `paidInterestAmount`, `paidDelayedInterestAmount`                      | Amounts settled so far                                                       |
-| `outstandingPrincipalAmount`, `outstandingInterestAmount`, `outstandingDelayedInterestAmount` | Amounts still open                                                           |
-| `accruedInterestAmount`                                                                       | Interest earned on the installment up to today, whether or not it is due yet |
+| Field                                                                                         | Meaning                                                                                                                                                                                        |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `totalPrincipalAmount`, `totalInterestAmount`, `totalDelayedInterestAmount`                   | Amounts due for the installment                                                                                                                                                                |
+| `paidPrincipalAmount`, `paidInterestAmount`, `paidDelayedInterestAmount`                      | Amounts settled so far                                                                                                                                                                         |
+| `outstandingPrincipalAmount`, `outstandingInterestAmount`, `outstandingDelayedInterestAmount` | Amounts still open                                                                                                                                                                             |
+| `accruedInterestAmount`                                                                       | Interest accrued on the installment up to today, whether or not it is due yet. For an installment that is not yet due, this is the interest that is settled if the installment is repaid today |
 
-Before sending a payment, read `getLoan` and add up the outstanding amounts of every installment with a due date up to and including the payment date. That is the amount that settles the loan to date.
+Before sending a payment, read `getLoan` and add up the outstanding amounts of every installment with a due date up to and including the payment date. That is the amount that settles the loan to date. To repay the loan early, add the outstanding principal and the `accruedInterestAmount` of every installment instead.
 
 ## Use cases
 
-All examples use a regular loan of EUR 900.00 at 10.80 %, created on the platform on 2027-01-15, with three installments of EUR 300.00 principal due on 2027-02-14, 2027-03-16 and 2027-04-15. The daily rate is 0.0003 and the scheduled interest is 8.10, 5.40 and 2.70, calculated as on the Interest calculation for repayment schedules page. Investors hold 90 % of the loan (EUR 810.00) and you retain 10 %. Delayed interest amounts assume a single investment of EUR 810.00. With several investments the per-investment truncation can make the loan total a few cents lower.
+All examples use a regular loan of EUR 900.00 at 10.80 %, created on the platform on 2027-01-15, with three installments of EUR 300.00 principal due on 2027-02-14, 2027-03-16 and 2027-04-15. The daily rate is 0.0003 and the scheduled interest is 8.10, 5.40 and 2.70, calculated as on the Interest calculation for repayment schedules page. Investors hold 90 % of the loan (EUR 810.00) and you retain 10 %. Delayed interest amounts assume a single investment of EUR 810.00. With several investments the amounts differ, as explained on the Delayed interest page.
 
 ### On-time payment
 
@@ -116,13 +117,28 @@ An installment that stays unpaid longer than the `buybackTermInDays` of your loa
 
 ### Several installments overdue
 
-Installments 1 and 2 are both unpaid on 2027-03-26. You report EUR 500.00. The payment is applied to installment 1 first (delayed interest, interest, principal), then to installment 2 in the same order. If the amount runs out during installment 2, the unpaid remainder of installment 2 stays outstanding and keeps accruing delayed interest. Installment 3 is not touched until installments 1 and 2 are fully settled.
+Installments 1 and 2 are both unpaid on 2027-03-26. Installment 1 is 40 days late and installment 2 is 10 days late. You report EUR 500.00.
+
+Delayed interest on the payment date, with a single investment: installment 1 has 270.00 × 0.0003 × 40 = 3.24, installment 2 has 270.00 × 0.0003 × 10 = 0.81.
+
+| Step | Claim                           | Outstanding | Allocated | Remaining payment |
+| ---- | ------------------------------- | ----------- | --------- | ----------------- |
+| 1    | Delayed interest, installment 1 | 3.24        | 3.24      | 496.76            |
+| 2    | Interest, installment 1         | 8.10        | 8.10      | 488.66            |
+| 3    | Principal, installment 1        | 300.00      | 300.00    | 188.66            |
+| 4    | Delayed interest, installment 2 | 0.81        | 0.81      | 187.85            |
+| 5    | Interest, installment 2         | 5.40        | 5.40      | 182.45            |
+| 6    | Principal, installment 2        | 300.00      | 182.45    | 0.00              |
+
+Response: `principalAmount` 482.45, `interestAmount` 13.50, `delayedInterestAmount` 4.05. Installment 1 is closed. Installment 2 stays open with EUR 117.55 principal outstanding, which keeps accruing delayed interest. Installment 3 is not touched until installment 2 is fully settled.
 
 ### Early full repayment
 
 You report the full outstanding balance on 2027-01-30, 15 days after the loan was created and before any installment is due.
 
 The platform recalculates the interest of the loan up to the payment date, because the borrower only owes interest for the days the principal was outstanding: 900.00 × 0.0003 × 15 = 4.05. The original scheduled interest of 8.10, 5.40 and 2.70 is revoked. The amount that settles the loan is EUR 904.05.
+
+You do not need to calculate this yourself. On 2027-01-30 `getLoan` returns `accruedInterestAmount` 4.05 on installment 1 and 0.00 on installments 2 and 3. The sum of `outstandingPrincipalAmount` and `accruedInterestAmount` over all installments is the early repayment amount.
 
 | Step | Claim                   | Outstanding | Allocated | Remaining payment |
 | ---- | ----------------------- | ----------- | --------- | ----------------- |
@@ -138,7 +154,7 @@ If you send the originally scheduled total of EUR 916.20 instead, EUR 12.15 is r
 
 You report EUR 500.00 on 2027-01-30, before installment 1 is due.
 
-Interest is recalculated to the payment date as in the previous example (EUR 4.05) and settled first. The rest of the payment reduces principal immediately. The principal that is paid early is taken from the installments in due-date order, so installment 1 is settled first.
+Interest is recalculated to the payment date as in the previous example (EUR 4.05, the `accruedInterestAmount` of installment 1 in `getLoan` on that day) and settled first. The rest of the payment reduces principal immediately. The principal that is paid early is taken from the installments in due-date order, so installment 1 is settled first.
 
 | Step | Claim                                 | Outstanding | Allocated | Remaining payment |
 | ---- | ------------------------------------- | ----------- | --------- | ----------------- |
@@ -171,4 +187,4 @@ Installment 1 is settled as in the on-time example (8.10 interest, 300.00 princi
 
 ### Overpayment
 
-An overpayment only arises when the payment exceeds everything outstanding on the loan. Installments 1 and 2 are paid. Installment 3 (300.00 principal, 2.70 interest) is due on 2027-04-15 and you report EUR 310.00 on that day. The platform settles 2.70 interest and 300.00 principal, moves the loan to `FINISHED`, and records EUR 7.30 as an overpayment. The response shows `principalAmount` 300.00 and `interestAmount` 2.70 only. Contact your Lendermarket account manager to reconcile the difference.
+An overpayment only arises when the payment exceeds everything outstanding on the loan. Installments 1 and 2 are paid. Installment 3 (300.00 principal, 2.70 interest) is due on 2027-04-15 and you report EUR 310.00 on that day. The platform settles 2.70 interest and 300.00 principal, moves the loan to `FINISHED`, and records EUR 7.30 as an overpayment. The response shows `principalAmount` 300.00 and `interestAmount` 2.70 only. The EUR 7.30 is not paid out to investors and is not applied to anything.
