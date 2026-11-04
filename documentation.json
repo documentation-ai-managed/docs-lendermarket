@@ -41,8 +41,18 @@
                 "path": "api/lender/authorizaiton"
               },
               {
-                "title": "Interest calculation guidelines",
-                "path": "api/lender/interest-calculation-guidelines"
+                "group": "Loan servicing",
+                "pages": [
+                  {
+                    "title": "Repayments and payment allocation",
+                    "path": "repayments-and-payment-allocation"
+                  },
+                  {
+                    "title": "Interest calculation guidelines",
+                    "path": "api/lender/interest-calculation-guidelines"
+                  }
+                ],
+                "icon": "fa-solid:euro-sign"
               },
               {
                 "group": "Endpoints",
