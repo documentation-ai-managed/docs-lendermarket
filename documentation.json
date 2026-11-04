@@ -34,12 +34,12 @@
                 "group": "Loan servicing",
                 "pages": [
                   {
-                    "title": "Repayments and payment allocation",
-                    "path": "repayments-and-payment-allocation"
-                  },
-                  {
                     "title": "Interest calculation guidelines",
                     "path": "api/lender/interest-calculation-guidelines"
+                  },
+                  {
+                    "title": "Repayments and payment allocation",
+                    "path": "repayments-and-payment-allocation"
                   }
                 ]
               },
