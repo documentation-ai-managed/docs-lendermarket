@@ -38,6 +38,10 @@
                     "path": "api/lender/interest-calculation-guidelines"
                   },
                   {
+                    "title": "Delayed interest calculation",
+                    "path": "api/lender/delayed-interest-calculation"
+                  },
+                  {
                     "title": "Payment allocation",
                     "path": "api/lender/payment-allocation"
                   }

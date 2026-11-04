@@ -1,0 +1,51 @@
+---
+title: Delayed interest calculation
+description: >-
+  Delayed interest is the interest the platform charges on principal that is
+  paid after its due date. It is a separate claim from the scheduled interest of
+  an installment, it is settled before scheduled interest and principal when a
+  payment is allocated, and it is reported in the delayedInterestAmount of
+  createLoanPayment and in the paymentSchedule of getLoan. This page explains
+  how it is calculated.
+---
+## When it starts and stops
+
+Delayed interest starts on the day after an installment's due date and runs until the overdue principal of that installment is paid. The installment due date itself does not count as a day of delay.
+
+If a payment covers only part of the overdue principal, the remaining part keeps accruing delayed interest until it is paid. Scheduled interest and delayed interest that are themselves unpaid do not accrue delayed interest.
+
+## How it is calculated
+
+| Parameter | Value                                                                                                                                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base      | The overdue principal of the installment that is held by investors. Your own retained share of the loan (`lenderSkinPercentage`) and any part of the installment that was not funded by investors do not accrue delayed interest |
+| Rate      | The loan daily rate, as defined on the Interest calculation for repayment schedules page                                                                                                                                         |
+| Day count | Calendar days from the due date to the payment date, or to today for an installment that is still unpaid                                                                                                                         |
+| Rounding  | Truncated (not rounded) to the currency precision per investment, then summed for the loan                                                                                                                                       |
+
+Because truncation is applied per investment, the delayed interest of a loan with many small investments can be a few cents lower than a single calculation on the total overdue principal would give.
+
+## When it is recalculated
+
+The platform recalculates delayed interest once a day for every active loan with an overdue installment, and again at the moment you report a payment with `createLoanPayment`. The amount shown by `getLoan` and the amount allocated by `createLoanPayment` are therefore both current as of the date of the call.
+
+## Where to see it
+
+`GET getLoan` returns, per installment, `totalDelayedInterestAmount` (accrued so far), `paidDelayedInterestAmount` and `outstandingDelayedInterestAmount`. Add the outstanding delayed interest of every overdue installment to the outstanding interest and principal to get the amount that settles the loan to date.
+
+## Example
+
+A regular loan of EUR 900.00 at 10.80 % (daily rate 0.0003) has installment 1 of EUR 300.00 principal due on 2027-02-14. Investors hold 90 % of the loan, so EUR 270.00 of that installment is investor-held principal. The installment is paid on 2027-02-26, 12 days late.
+
+| Item                            | Value                                           |
+| ------------------------------- | ----------------------------------------------- |
+| Overdue investor-held principal | 270.00                                          |
+| Daily rate                      | 0.0003                                          |
+| Days late                       | 12                                              |
+| Delayed interest                | 270.00 × 0.0003 × 12 = 0.972, truncated to 0.97 |
+
+The amount that settles installment 1 on 2027-02-26 is 0.97 delayed interest + 8.10 interest + 300.00 principal = EUR 309.07. See the Payment allocation page for how a smaller payment is allocated.
+
+## Relation to buyback
+
+An installment that stays unpaid longer than the `buybackTermInDays` of your loan publishing rule triggers an automatic loan buyback. See the buyback page for the amounts involved.
